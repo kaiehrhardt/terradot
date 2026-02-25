@@ -1,0 +1,20 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "packageRules": [
+    {
+      "description": "Group all dependencies together",
+      "groupName": "all dependencies",
+      "groupSlug": "all",
+      "matchPackageNames": ["*"],
+      "schedule": ["before 3am on Monday", "before 3am on Thursday"]
+    }
+  ],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "labels": ["dependencies"],
+  "assignees": ["kaiehrhardt"],
+  "reviewers": ["kaiehrhardt"]
+}

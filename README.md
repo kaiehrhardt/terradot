@@ -3,9 +3,9 @@
 An interactive web service for visualizing and exploring Graphviz DOT graphs.
 
 ![TerraDot](https://img.shields.io/badge/Built%20with-Bun-black?logo=bun)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)
-![React](https://img.shields.io/badge/React-19-blue?logo=react)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-blue?logo=tailwindcss)
+![TypeScript](https://img.shields.io/badge/TypeScript-blue?logo=typescript)
+![React](https://img.shields.io/badge/React-blue?logo=react)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-blue?logo=tailwindcss)
 
 ## ✨ Features
 
@@ -68,14 +68,14 @@ The dev server runs at `http://localhost:5173/`
 ```dot
 digraph Example {
   rankdir=TB;
-  
+
   Root [shape=box, style=filled, fillcolor=lightgreen];
-  
+
   Root -> A;
   Root -> B;
   A -> C;
   B -> C;
-  
+
   C [shape=doublecircle];
 }
 ```
