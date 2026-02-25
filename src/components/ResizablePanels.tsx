@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, type ReactNode } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 
 interface ResizablePanelsProps {
   leftPanel: ReactNode;
@@ -25,7 +25,7 @@ export default function ResizablePanels({
 
       const containerRect = containerRef.current.getBoundingClientRect();
       const newWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
-      
+
       const clampedWidth = Math.min(Math.max(newWidth, minLeftWidth), maxLeftWidth);
       setLeftWidth(clampedWidth);
     };
@@ -71,9 +71,7 @@ export default function ResizablePanels({
       </div>
 
       {/* Right Panel */}
-      <div className="flex-1 p-1">
-        {rightPanel}
-      </div>
+      <div className="flex-1 p-1">{rightPanel}</div>
     </div>
   );
 }

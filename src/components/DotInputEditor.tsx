@@ -19,7 +19,7 @@ export default function DotInputEditor({ value, onChange, onLoadExample }: DotIn
 
       <textarea
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={e => onChange(e.target.value)}
         className="flex-1 w-full p-2 font-mono text-xs bg-white dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-500 transition-colors"
         placeholder="Enter DOT graph syntax here...
 
@@ -34,9 +34,7 @@ digraph G {
       />
 
       <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
-        <p>
-          Click on a node to highlight the path to the root.
-        </p>
+        <p>Click on a node to highlight the path to the root.</p>
       </div>
     </div>
   );

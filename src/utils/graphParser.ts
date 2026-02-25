@@ -60,7 +60,7 @@ export function parseDotString(dotString: string): GraphData {
  */
 export function findRootNodes(graphData: GraphData): string[] {
   const nodesWithIncoming = new Set<string>();
-  
+
   graphData.edges.forEach(edge => {
     nodesWithIncoming.add(edge.to);
   });
@@ -81,7 +81,7 @@ export function findRootNodes(graphData: GraphData): string[] {
  */
 export function findPathToRoot(nodeId: string, graphData: GraphData): string[] {
   const roots = findRootNodes(graphData);
-  
+
   if (roots.includes(nodeId)) {
     return [nodeId];
   }
@@ -110,13 +110,13 @@ export function findPathToRoot(nodeId: string, graphData: GraphData): string[] {
 
     // Get all parent nodes (incoming edges)
     const parents = graphData.adjacencyList.get(current) || [];
-    
+
     if (parents.length === 0 && path.length > 1) {
       // Current node has no more parents - this is as far as we can go
       // Return this path even if it's not a "true" root
       return path;
     }
-    
+
     for (const parent of parents) {
       if (!visited.has(parent)) {
         queue.push([...path, parent]);
@@ -133,39 +133,42 @@ export function findPathToRoot(nodeId: string, graphData: GraphData): string[] {
  * Find all ancestors of a node (all nodes that have a path to this node)
  * Returns both the set of ancestor nodes and all edges in the ancestor tree
  */
-export function findAllAncestors(nodeId: string, graphData: GraphData): { nodes: Set<string>, edges: Set<string> } {
+export function findAllAncestors(
+  nodeId: string,
+  graphData: GraphData
+): { nodes: Set<string>; edges: Set<string> } {
   const ancestorNodes = new Set<string>();
   const ancestorEdges = new Set<string>();
   const visited = new Set<string>();
   const queue: string[] = [nodeId];
-  
+
   // Add the clicked node itself
   ancestorNodes.add(nodeId);
-  
+
   while (queue.length > 0) {
     const current = queue.shift()!;
-    
+
     if (visited.has(current)) continue;
     visited.add(current);
-    
+
     // Get all parent nodes (nodes that point to current)
     const parents = graphData.adjacencyList.get(current) || [];
-    
+
     for (const parent of parents) {
       // Add parent node to ancestors
       ancestorNodes.add(parent);
-      
+
       // Add edge to ancestor edges (both directions for matching)
       ancestorEdges.add(`${parent}->${current}`);
       ancestorEdges.add(`${current}<-${parent}`);
-      
+
       // Continue traversing up the tree
       if (!visited.has(parent)) {
         queue.push(parent);
       }
     }
   }
-  
+
   return { nodes: ancestorNodes, edges: ancestorEdges };
 }
 
@@ -173,33 +176,36 @@ export function findAllAncestors(nodeId: string, graphData: GraphData): { nodes:
  * Find all successors of a node (all nodes that this node has a path to)
  * Returns both the set of successor nodes and all edges in the successor tree
  */
-export function findAllSuccessors(nodeId: string, graphData: GraphData): { nodes: Set<string>, edges: Set<string> } {
+export function findAllSuccessors(
+  nodeId: string,
+  graphData: GraphData
+): { nodes: Set<string>; edges: Set<string> } {
   const successorNodes = new Set<string>();
   const successorEdges = new Set<string>();
   const visited = new Set<string>();
   const queue: string[] = [nodeId];
-  
+
   // Add the clicked node itself
   successorNodes.add(nodeId);
-  
+
   while (queue.length > 0) {
     const current = queue.shift()!;
-    
+
     if (visited.has(current)) continue;
     visited.add(current);
-    
+
     // Get all child nodes (nodes that current points to)
     for (const edge of graphData.edges) {
       if (edge.from === current) {
         const child = edge.to;
-        
+
         // Add child node to successors
         successorNodes.add(child);
-        
+
         // Add edge to successor edges (both directions for matching)
         successorEdges.add(`${current}->${child}`);
         successorEdges.add(`${child}<-${current}`);
-        
+
         // Continue traversing down the tree
         if (!visited.has(child)) {
           queue.push(child);
@@ -207,7 +213,7 @@ export function findAllSuccessors(nodeId: string, graphData: GraphData): { nodes
       }
     }
   }
-  
+
   return { nodes: successorNodes, edges: successorEdges };
 }
 
@@ -216,12 +222,12 @@ export function findAllSuccessors(nodeId: string, graphData: GraphData): { nodes
  */
 export function getPathEdges(path: string[]): Set<string> {
   const pathEdges = new Set<string>();
-  
+
   for (let i = 0; i < path.length - 1; i++) {
     // Edge format: "from->to" or "to<-from" depending on direction
     pathEdges.add(`${path[i + 1]}->${path[i]}`);
     pathEdges.add(`${path[i]}<-${path[i + 1]}`);
   }
-  
+
   return pathEdges;
 }

@@ -1,9 +1,14 @@
-import { useState, useCallback, useMemo, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import GraphViewer from './components/GraphViewer';
 import DotInputEditor from './components/DotInputEditor';
 import GraphControls from './components/GraphControls';
 import ResizablePanels from './components/ResizablePanels';
-import { parseDotString, findAllAncestors, findAllSuccessors, findRootNodes } from './utils/graphParser';
+import {
+  findAllAncestors,
+  findAllSuccessors,
+  findRootNodes,
+  parseDotString,
+} from './utils/graphParser';
 import { EXAMPLE_GRAPH } from './utils/examples';
 import type { LayoutEngine } from './types/graph.types';
 
@@ -13,7 +18,7 @@ function App() {
   const [layoutEngine, setLayoutEngine] = useState<LayoutEngine>('dot');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuccessors, setShowSuccessors] = useState(false);
-  
+
   // Dark mode state with localStorage persistence
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem('darkMode');
@@ -55,7 +60,7 @@ function App() {
     if (!selectedNode || graphData.nodes.size === 0) {
       return { nodes: new Set<string>(), edges: new Set<string>() };
     }
-    return showSuccessors 
+    return showSuccessors
       ? findAllSuccessors(selectedNode, graphData)
       : findAllAncestors(selectedNode, graphData);
   }, [selectedNode, graphData, showSuccessors]);
@@ -86,20 +91,20 @@ function App() {
   // Generate info message
   const highlightedNodeInfo = useMemo(() => {
     if (!selectedNode) return undefined;
-    
+
     const roots = findRootNodes(graphData);
     const highlightCount = highlightData.nodes.size;
-    
+
     if (roots.includes(selectedNode)) {
       return `"${selectedNode}" is a root node`;
     }
-    
+
     if (highlightCount > 1) {
       const edgeCount = highlightData.edges.size / 2;
       const type = showSuccessors ? 'successor' : 'ancestor';
       return `"${selectedNode}" has ${highlightCount - 1} ${type}${highlightCount - 1 !== 1 ? 's' : ''} (${edgeCount} edge${edgeCount !== 1 ? 's' : ''})`;
     }
-    
+
     return `"${selectedNode}" (isolated node)`;
   }, [selectedNode, graphData, highlightData, showSuccessors]);
 

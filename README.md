@@ -1,6 +1,6 @@
 # TerraDot - Interactive DOT Graph Viewer
 
-Ein interaktiver Webservice zur Darstellung und Erkundung von Graphviz DOT-Graphen.
+An interactive web service for visualizing and exploring Graphviz DOT graphs.
 
 ![TerraDot](https://img.shields.io/badge/Built%20with-Bun-black?logo=bun)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.9-blue?logo=typescript)
@@ -9,50 +9,61 @@ Ein interaktiver Webservice zur Darstellung und Erkundung von Graphviz DOT-Graph
 
 ## ✨ Features
 
-- **Interaktive Graph-Visualisierung**: Rendern Sie DOT-Graphen mit echter Graphviz-Engine (WebAssembly)
-- **Intelligentes Pfad-Highlighting**: Klicken Sie auf einen Knoten, um den Pfad zum Root hervorzuheben
-  - Findet automatisch Root-Knoten (ohne eingehende Kanten)
-  - Bei Graphen ohne Root: Zeigt Pfad bis zum ersten Vorgänger
-  - Unterstützt zyklische Graphen und isolierte Knoten
-- **Mehrere Layout-Engines**: dot, neato, fdp, circo, twopi, osage
-- **Knotensuche**: Durchsuchen und filtern Sie Knoten nach Namen
-- **Zoom & Pan**: Navigieren Sie durch große Graphen mit Maus-Zoom und Drag
-- **Live-Vorschau**: Änderungen am DOT-Code werden sofort visualisiert
-- **Beispiel-Graphen**: Vorgefertigte Beispiele zum schnellen Start
+- **Interactive Graph Visualization**: Render DOT graphs with real Graphviz engine (WebAssembly)
+- **Bidirectional Path Highlighting**: Click on a node to highlight paths
+  - **Predecessors Mode**: Shows all ancestor paths leading TO the clicked node
+  - **Successors Mode**: Shows all descendant paths leading FROM the clicked node
+  - Automatically finds root nodes (without incoming edges)
+  - Supports cyclic graphs and isolated nodes
+  - Highlights both nodes AND connecting edges in paths
+- **Dark Mode**: Full dark mode support with persistent preferences
+- **Multiple Layout Options**: Three directional layouts using dot engine
+  - Top to Bottom (hierarchical)
+  - Left to Right
+  - Right to Left
+- **Resizable Panels**: Adjustable split view between editor and graph viewer
+- **Node Search**: Search and filter nodes by name with real-time highlighting
+- **Zoom & Pan**: Navigate through large graphs with mouse zoom (0.1-50x) and drag
+- **Live Preview**: Changes to DOT code are instantly visualized
+- **Example Graphs**: Pre-made examples for quick start
 
-## 🚀 Schnellstart
+## 🚀 Quick Start
 
-### Voraussetzungen
+### Prerequisites
 
 - [Bun](https://bun.sh/) >= 1.0
 
 ### Installation
 
 ```bash
-# Dependencies installieren
+# Install dependencies
 bun install
 
-# Development-Server starten
+# Start development server
 bun dev
 
-# Production-Build erstellen
+# Create production build
 bun run build
 
-# Production-Build lokal testen
+# Test production build locally
 bun preview
 ```
 
-Der Dev-Server läuft unter `http://localhost:5173/`
+The dev server runs at `http://localhost:5173/`
 
-## 🎯 Verwendung
+## 🎯 Usage
 
-1. **DOT-Code eingeben**: Geben Sie Ihre DOT-Graph-Syntax im linken Editor-Panel ein
-2. **Graph visualisieren**: Der Graph wird automatisch gerendert
-3. **Layout wählen**: Wählen Sie verschiedene Graphviz-Layout-Engines aus (hierarchisch, force-directed, etc.)
-4. **Knoten anklicken**: Klicken Sie auf einen Knoten, um den Pfad zum Root-Knoten hervorzuheben
-5. **Suchen**: Verwenden Sie die Suchleiste, um spezifische Knoten zu finden
+1. **Enter DOT code**: Enter your DOT graph syntax in the left editor panel
+2. **Visualize graph**: The graph will be automatically rendered
+3. **Choose layout**: Select different directional layouts (Top-to-Bottom, Left-to-Right, Right-to-Left)
+4. **Click nodes**: Click on a node to highlight paths
+   - Use the toggle to switch between Predecessors (ancestors) and Successors (descendants)
+   - View detailed path statistics in the info panel
+5. **Search**: Use the search bar to find and highlight specific nodes
+6. **Resize panels**: Drag the divider between editor and viewer to adjust sizes
+7. **Toggle dark mode**: Click the theme toggle for comfortable viewing in any lighting
 
-### Beispiel DOT-Syntax
+### Example DOT Syntax
 
 ```dot
 digraph Example {
@@ -69,84 +80,45 @@ digraph Example {
 }
 ```
 
-## 🏗️ Projektstruktur
+## 🏗️ Project Structure
 
 ```
 terradot/
 ├── src/
 │   ├── components/
-│   │   ├── GraphViewer.tsx        # Haupt-Graph-Rendering-Komponente
-│   │   ├── DotInputEditor.tsx     # DOT-Syntax-Editor
-│   │   └── GraphControls.tsx      # Steuerung (Suche, Layout)
+│   │   ├── GraphViewer.tsx        # Main graph rendering component (d3-graphviz)
+│   │   ├── GraphControls.tsx      # Controls (search, layout, dark mode, toggle)
+│   │   ├── DotInputEditor.tsx     # DOT syntax editor
+│   │   └── ResizablePanels.tsx    # Resizable split-panel layout
 │   ├── utils/
-│   │   ├── graphParser.ts         # DOT-Parsing & Pfad-Algorithmen
-│   │   └── examples.ts            # Beispiel-Graphen
+│   │   ├── graphParser.ts         # DOT parsing & path algorithms (BFS, ancestors, successors)
+│   │   └── examples.ts            # Example graphs
 │   ├── types/
-│   │   └── graph.types.ts         # TypeScript-Typen
-│   └── App.tsx                    # Haupt-App-Komponente
+│   │   └── graph.types.ts         # TypeScript types
+│   ├── App.tsx                    # Main app component & state management
+│   ├── main.tsx                   # App entry point
+│   └── index.css                  # Tailwind + custom graph styles
 ├── package.json
 └── README.md
 ```
 
-## 🛠️ Technologie-Stack
+## 🛠️ Technology Stack
 
-- **Framework**: [React](https://react.dev/) 19 mit TypeScript
-- **Build-Tool**: [Vite](https://vitejs.dev/)
-- **Paketmanager**: [Bun](https://bun.sh/)
-- **Graph-Rendering**: [d3-graphviz](https://github.com/magjac/d3-graphviz) (Graphviz via WebAssembly)
+- **Framework**: [React](https://react.dev/) 19 with TypeScript
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Package Manager**: [Bun](https://bun.sh/)
+- **Graph Rendering**: [d3-graphviz](https://github.com/magjac/d3-graphviz) (Graphviz via WebAssembly)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) 3
-- **Graphviz-Engine**: [@hpcc-js/wasm](https://github.com/hpcc-systems/hpcc-js-wasm)
+- **Graphviz Engine**: [@hpcc-js/wasm](https://github.com/hpcc-systems/hpcc-js-wasm)
 
-## 🧩 Kern-Algorithmen
-
-### Root-Knoten-Erkennung
-
-Findet alle Knoten ohne eingehende Kanten:
-
-```typescript
-function findRootNodes(graphData: GraphData): string[] {
-  const nodesWithIncoming = new Set<string>();
-  graphData.edges.forEach(edge => nodesWithIncoming.add(edge.to));
-  
-  return Array.from(graphData.nodes.keys())
-    .filter(nodeId => !nodesWithIncoming.has(nodeId));
-}
-```
-
-### Pfadsuche (BFS)
-
-Findet den kürzesten Pfad von einem Knoten zum Root:
-
-```typescript
-function findPathToRoot(nodeId: string, graphData: GraphData): string[] {
-  const roots = findRootNodes(graphData);
-  const queue: string[][] = [[nodeId]];
-  const visited = new Set<string>();
-  
-  while (queue.length > 0) {
-    const path = queue.shift()!;
-    const current = path[path.length - 1];
-    
-    if (roots.includes(current)) return path;
-    if (visited.has(current)) continue;
-    
-    visited.add(current);
-    const parents = graphData.adjacencyList.get(current) || [];
-    parents.forEach(parent => queue.push([...path, parent]));
-  }
-  
-  return [nodeId];
-}
-```
-
-## 📝 Lizenz
+## 📝 License
 
 MIT
 
-## 🤝 Beiträge
+## 🤝 Contributing
 
-Beiträge sind willkommen! Bitte öffnen Sie ein Issue oder Pull Request.
+Contributions are welcome! Please open an issue or pull request.
 
 ---
 
-**Entwickelt mit ❤️ und Bun**
+**Built with ❤️ and Bun**
