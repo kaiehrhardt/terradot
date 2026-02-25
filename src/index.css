@@ -1,0 +1,127 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom styles for graph highlighting */
+.graph-container svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* ============================================ */
+/* LIGHT MODE (Default - Original Styling)     */
+/* ============================================ */
+
+/* Light mode highlighting - Nodes */
+.node.node-highlighted ellipse,
+.node.node-highlighted polygon,
+.node.node-highlighted path {
+  stroke: #3b82f6 !important;
+  stroke-width: 3 !important;
+  fill: #dbeafe !important;
+}
+
+.node.node-highlighted text {
+  font-weight: bold !important;
+  fill: #1e40af !important;
+}
+
+/* Light mode highlighting - Edges */
+.edge.edge-highlighted path {
+  stroke: #ef4444 !important;
+  stroke-width: 3 !important;
+}
+
+.edge.edge-highlighted polygon {
+  stroke: #ef4444 !important;
+  fill: #ef4444 !important;
+}
+
+.edge.edge-highlighted text {
+  fill: #ef4444 !important;
+  font-weight: bold !important;
+}
+
+/* ============================================ */
+/* DARK MODE (Only affects graph SVG)          */
+/* ============================================ */
+
+/* Dark mode - Container background */
+.dark .graph-container {
+  background-color: #111827;
+}
+
+/* Dark mode - Normal graph elements (not highlighted) */
+.dark .graph-container svg .node:not(.node-highlighted) ellipse,
+.dark .graph-container svg .node:not(.node-highlighted) polygon,
+.dark .graph-container svg .node:not(.node-highlighted) path {
+  fill: #374151 !important;
+  stroke: #6b7280 !important;
+}
+
+.dark .graph-container svg .node:not(.node-highlighted) text {
+  fill: #d1d5db !important;
+}
+
+.dark .graph-container svg .edge:not(.edge-highlighted) path {
+  stroke: #6b7280 !important;
+}
+
+.dark .graph-container svg .edge:not(.edge-highlighted) polygon {
+  stroke: #6b7280 !important;
+  fill: #6b7280 !important;
+}
+
+.dark .graph-container svg .edge:not(.edge-highlighted) text {
+  fill: #9ca3af !important;
+}
+
+/* Dark mode - Highlighted nodes (bright and visible) */
+.dark .node.node-highlighted ellipse,
+.dark .node.node-highlighted polygon,
+.dark .node.node-highlighted path {
+  stroke: #60a5fa !important;
+  stroke-width: 4 !important;
+  fill: #1e40af !important;
+}
+
+.dark .node.node-highlighted text {
+  font-weight: bold !important;
+  fill: #bfdbfe !important;
+}
+
+/* Dark mode - Highlighted edges (bright orange for visibility) */
+.dark .edge.edge-highlighted path {
+  stroke: #fb923c !important;
+  stroke-width: 4 !important;
+}
+
+.dark .edge.edge-highlighted polygon {
+  stroke: #fb923c !important;
+  fill: #fb923c !important;
+}
+
+.dark .edge.edge-highlighted text {
+  fill: #fdba74 !important;
+  font-weight: bold !important;
+}
+
+/* Dark mode - Subgraphs/Clusters (lighter background for visibility) */
+.dark .graph-container svg .cluster polygon,
+.dark .graph-container svg .cluster rect {
+  fill: #1f2937 !important;
+  stroke: #4b5563 !important;
+  stroke-width: 1.5 !important;
+}
+
+.dark .graph-container svg .cluster text {
+  fill: #e5e7eb !important;
+  font-weight: 600 !important;
+}
