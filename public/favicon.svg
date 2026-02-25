@@ -1,0 +1,26 @@
+<!--?xml version="1.0" encoding="UTF-8"?-->
+<svg width="64" height="64" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+
+  <!-- Terraform (abstrahiert) -->
+  <g fill="#7B42F6">
+    <rect x="8" y="18" width="14" height="14" rx="2"></rect>
+    <rect x="24" y="18" width="14" height="14" rx="2"></rect>
+    <rect x="16" y="34" width="14" height="14" rx="2"></rect>
+  </g>
+
+  <!-- Graph (abstrahiert) -->
+  <g stroke="#1A1A1A" stroke-width="2">
+    <!-- Verbindungen -->
+    <line x1="44" y1="18" x2="56" y2="32"></line>
+    <line x1="56" y1="32" x2="44" y2="46"></line>
+    <line x1="44" y1="46" x2="32" y2="32"></line>
+    <line x1="32" y1="32" x2="44" y2="18"></line>
+    
+    <!-- Nodes -->
+    <circle cx="44" cy="18" r="4" fill="#FF9F1C"></circle>
+    <circle cx="56" cy="32" r="4" fill="#E71D36"></circle>
+    <circle cx="44" cy="46" r="4" fill="#2EC4B6"></circle>
+    <circle cx="32" cy="32" r="4" fill="#3A86FF"></circle>
+  </g>
+
+</svg>

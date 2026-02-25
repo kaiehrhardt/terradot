@@ -112,10 +112,16 @@ function App() {
     <div className="h-screen flex flex-col bg-gray-100 dark:bg-gray-900 transition-colors">
       {/* Header */}
       <header className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900 text-white px-6 py-4 shadow-lg">
-        <h1 className="text-2xl font-bold">TerraDot - Interactive DOT Graph Viewer</h1>
-        <p className="text-blue-100 dark:text-blue-200 text-sm mt-1">
-          Visualize and explore Graphviz DOT graphs • Click nodes to highlight all ancestor paths
-        </p>
+        <div className="flex items-center gap-3">
+          <img src="/favicon.svg" alt="TerraDot Logo" className="h-12 w-12" />
+          <div>
+            <h1 className="text-2xl font-bold">TerraDot - Interactive DOT Graph Viewer</h1>
+            <p className="text-blue-100 dark:text-blue-200 text-sm mt-1">
+              Visualize and explore Graphviz DOT graphs • Click nodes to highlight all ancestor
+              paths
+            </p>
+          </div>
+        </div>
       </header>
 
       {/* Controls */}

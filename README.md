@@ -1,3 +1,7 @@
+<div align="center">
+
+<img src="public/logo.png" alt="TerraDot Logo" width="400">
+
 # TerraDot - Interactive DOT Graph Viewer
 
 An interactive web service for visualizing and exploring Graphviz DOT graphs.
@@ -6,6 +10,10 @@ An interactive web service for visualizing and exploring Graphviz DOT graphs.
 ![TypeScript](https://img.shields.io/badge/TypeScript-blue?logo=typescript)
 ![React](https://img.shields.io/badge/React-blue?logo=react)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-blue?logo=tailwindcss)
+
+---
+
+</div>
 
 ## ✨ Features
 
@@ -26,6 +34,10 @@ An interactive web service for visualizing and exploring Graphviz DOT graphs.
 - **Zoom & Pan**: Navigate through large graphs with mouse zoom (0.1-50x) and drag
 - **Live Preview**: Changes to DOT code are instantly visualized
 - **Example Graphs**: Pre-made examples for quick start
+
+## 🎯 Target Audience
+
+This tool is specifically designed for **Terraform users** who work with `terraform graph` and need to debug and understand their infrastructure dependencies. It provides an interactive way to explore Terraform dependency graphs, making it easier to identify issues, understand resource relationships, and optimize your infrastructure code.
 
 ## 🚀 Quick Start
 
