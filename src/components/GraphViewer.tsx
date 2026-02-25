@@ -143,6 +143,7 @@ export default function GraphViewer({
       const gv = graphviz(containerRef.current, {
         useWorker: false,
         zoom: true,
+        zoomScaleExtent: [0.1, 50],
       })
         .engine(actualEngine)
         .onerror((err) => {

@@ -170,6 +170,48 @@ export function findAllAncestors(nodeId: string, graphData: GraphData): { nodes:
 }
 
 /**
+ * Find all successors of a node (all nodes that this node has a path to)
+ * Returns both the set of successor nodes and all edges in the successor tree
+ */
+export function findAllSuccessors(nodeId: string, graphData: GraphData): { nodes: Set<string>, edges: Set<string> } {
+  const successorNodes = new Set<string>();
+  const successorEdges = new Set<string>();
+  const visited = new Set<string>();
+  const queue: string[] = [nodeId];
+  
+  // Add the clicked node itself
+  successorNodes.add(nodeId);
+  
+  while (queue.length > 0) {
+    const current = queue.shift()!;
+    
+    if (visited.has(current)) continue;
+    visited.add(current);
+    
+    // Get all child nodes (nodes that current points to)
+    for (const edge of graphData.edges) {
+      if (edge.from === current) {
+        const child = edge.to;
+        
+        // Add child node to successors
+        successorNodes.add(child);
+        
+        // Add edge to successor edges (both directions for matching)
+        successorEdges.add(`${current}->${child}`);
+        successorEdges.add(`${child}<-${current}`);
+        
+        // Continue traversing down the tree
+        if (!visited.has(child)) {
+          queue.push(child);
+        }
+      }
+    }
+  }
+  
+  return { nodes: successorNodes, edges: successorEdges };
+}
+
+/**
  * Get edges that form a path
  */
 export function getPathEdges(path: string[]): Set<string> {

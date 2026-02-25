@@ -3,7 +3,7 @@ import GraphViewer from './components/GraphViewer';
 import DotInputEditor from './components/DotInputEditor';
 import GraphControls from './components/GraphControls';
 import ResizablePanels from './components/ResizablePanels';
-import { parseDotString, findAllAncestors, findRootNodes } from './utils/graphParser';
+import { parseDotString, findAllAncestors, findAllSuccessors, findRootNodes } from './utils/graphParser';
 import { EXAMPLE_GRAPH } from './utils/examples';
 import type { LayoutEngine } from './types/graph.types';
 
@@ -12,6 +12,7 @@ function App() {
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [layoutEngine, setLayoutEngine] = useState<LayoutEngine>('dot');
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSuccessors, setShowSuccessors] = useState(false);
   
   // Dark mode state with localStorage persistence
   const [darkMode, setDarkMode] = useState(() => {
@@ -34,6 +35,11 @@ function App() {
     setDarkMode((prev: boolean) => !prev);
   }, []);
 
+  // Toggle between ancestors and successors
+  const handleToggleSuccessors = useCallback(() => {
+    setShowSuccessors((prev: boolean) => !prev);
+  }, []);
+
   // Debounce DOT string parsing
   const graphData = useMemo(() => {
     try {
@@ -44,13 +50,15 @@ function App() {
     }
   }, [dotString]);
 
-  // Calculate all ancestors when a node is selected
-  const ancestorData = useMemo(() => {
+  // Calculate all ancestors or successors when a node is selected
+  const highlightData = useMemo(() => {
     if (!selectedNode || graphData.nodes.size === 0) {
       return { nodes: new Set<string>(), edges: new Set<string>() };
     }
-    return findAllAncestors(selectedNode, graphData);
-  }, [selectedNode, graphData]);
+    return showSuccessors 
+      ? findAllSuccessors(selectedNode, graphData)
+      : findAllAncestors(selectedNode, graphData);
+  }, [selectedNode, graphData, showSuccessors]);
 
   // Handle node click
   const handleNodeClick = useCallback((nodeId: string) => {
@@ -80,19 +88,20 @@ function App() {
     if (!selectedNode) return undefined;
     
     const roots = findRootNodes(graphData);
-    const ancestorCount = ancestorData.nodes.size;
+    const highlightCount = highlightData.nodes.size;
     
     if (roots.includes(selectedNode)) {
       return `"${selectedNode}" is a root node`;
     }
     
-    if (ancestorCount > 1) {
-      const edgeCount = ancestorData.edges.size / 2;
-      return `"${selectedNode}" has ${ancestorCount - 1} ancestor${ancestorCount - 1 !== 1 ? 's' : ''} (${edgeCount} edge${edgeCount !== 1 ? 's' : ''})`;
+    if (highlightCount > 1) {
+      const edgeCount = highlightData.edges.size / 2;
+      const type = showSuccessors ? 'successor' : 'ancestor';
+      return `"${selectedNode}" has ${highlightCount - 1} ${type}${highlightCount - 1 !== 1 ? 's' : ''} (${edgeCount} edge${edgeCount !== 1 ? 's' : ''})`;
     }
     
     return `"${selectedNode}" (isolated node)`;
-  }, [selectedNode, graphData, ancestorData]);
+  }, [selectedNode, graphData, highlightData, showSuccessors]);
 
   return (
     <div className="h-screen flex flex-col bg-gray-100 dark:bg-gray-900 transition-colors">
@@ -113,6 +122,8 @@ function App() {
         highlightedNodeInfo={highlightedNodeInfo}
         darkMode={darkMode}
         onToggleDarkMode={handleToggleDarkMode}
+        showSuccessors={showSuccessors}
+        onToggleSuccessors={handleToggleSuccessors}
       />
 
       {/* Main Content */}
@@ -132,8 +143,8 @@ function App() {
             <GraphViewer
               dotString={dotString}
               onNodeClick={handleNodeClick}
-              highlightedNodes={ancestorData.nodes}
-              highlightedEdges={ancestorData.edges}
+              highlightedNodes={highlightData.nodes}
+              highlightedEdges={highlightData.edges}
               layoutEngine={layoutEngine}
               searchQuery={searchQuery}
             />

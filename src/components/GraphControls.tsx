@@ -8,6 +8,8 @@ interface GraphControlsProps {
   highlightedNodeInfo?: string;
   darkMode: boolean;
   onToggleDarkMode: () => void;
+  showSuccessors: boolean;
+  onToggleSuccessors: () => void;
 }
 
 const layoutOptions: { value: LayoutEngine; label: string; description: string }[] = [
@@ -24,6 +26,8 @@ export default function GraphControls({
   highlightedNodeInfo,
   darkMode,
   onToggleDarkMode,
+  showSuccessors,
+  onToggleSuccessors,
 }: GraphControlsProps) {
   return (
     <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 shadow-sm transition-colors">
@@ -81,6 +85,29 @@ export default function GraphControls({
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
               </svg>
               <span>Dark</span>
+            </>
+          )}
+        </button>
+
+        {/* Predecessors/Successors Toggle */}
+        <button
+          onClick={onToggleSuccessors}
+          className="flex items-center gap-2 px-3 py-2 rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300"
+          aria-label="Toggle between predecessors and successors"
+        >
+          {showSuccessors ? (
+            <>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+              </svg>
+              <span>Successors</span>
+            </>
+          ) : (
+            <>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 17l-5-5m0 0l5-5m-5 5h12" />
+              </svg>
+              <span>Predecessors</span>
             </>
           )}
         </button>
