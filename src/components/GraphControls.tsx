@@ -6,7 +6,6 @@ interface GraphControlsProps {
   onLayoutChange: (layoutEngine: LayoutEngine) => void;
   searchQuery: string;
   onSearchChange: (searchQuery: string) => void;
-  highlightedNodeInfo?: string;
   darkMode: boolean;
   onToggleDarkMode: () => void;
   showSuccessors: boolean;
@@ -27,7 +26,6 @@ export default function GraphControls({
   onLayoutChange,
   searchQuery,
   onSearchChange,
-  highlightedNodeInfo,
   darkMode,
   onToggleDarkMode,
   showSuccessors,
@@ -148,13 +146,6 @@ export default function GraphControls({
             </>
           )}
         </button>
-
-        {/* Highlighted Node Info */}
-        {highlightedNodeInfo && (
-          <div className="px-3 py-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-md text-sm text-blue-800 dark:text-blue-200 transition-colors">
-            {highlightedNodeInfo}
-          </div>
-        )}
       </div>
     </div>
   );

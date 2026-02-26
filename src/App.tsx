@@ -168,7 +168,6 @@ function App() {
         onLayoutChange={handleLayoutChange}
         searchQuery={searchQuery}
         onSearchChange={handleSearchChange}
-        highlightedNodeInfo={highlightedNodeInfo}
         darkMode={darkMode}
         onToggleDarkMode={handleToggleDarkMode}
         showSuccessors={showSuccessors}
@@ -205,8 +204,18 @@ function App() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-6 py-3 text-center text-sm text-gray-600 dark:text-gray-400 transition-colors">
-        Built with React, TypeScript, D3-Graphviz, and Tailwind CSS • Powered by Bun
+      {highlightedNodeInfo && (
+        <div className="fixed bottom-16 right-6 z-20">
+          <div className="px-3 py-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-md text-sm text-blue-800 dark:text-blue-200 transition-colors shadow-sm">
+            {highlightedNodeInfo}
+          </div>
+        </div>
+      )}
+
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-6 py-3 text-sm text-gray-600 dark:text-gray-400 transition-colors">
+        <div className="text-center">
+          Built with React, TypeScript, D3-Graphviz, and Tailwind CSS • Powered by Bun
+        </div>
       </footer>
     </div>
   );
