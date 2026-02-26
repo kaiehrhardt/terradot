@@ -10,6 +10,7 @@ import {
   parseDotString,
   extractModules,
   filterGraphByModules,
+  filterGraphByDataNodes,
   graphDataToDotString,
 } from './utils/graphParser';
 import { EXAMPLE_GRAPH } from './utils/examples';
@@ -22,6 +23,7 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuccessors, setShowSuccessors] = useState(false);
   const [selectedModules, setSelectedModules] = useState<Set<string>>(new Set());
+  const [ignoreDataNodes, setIgnoreDataNodes] = useState(false);
 
   // Dark mode state with localStorage persistence
   const [darkMode, setDarkMode] = useState(() => {
@@ -72,18 +74,28 @@ function App() {
 
   // Filter graph data based on selected modules
   const filteredGraphData = useMemo(() => {
-    return filterGraphByModules(graphData, selectedModules, availableModules);
-  }, [graphData, selectedModules, availableModules]);
+    const moduleFiltered = filterGraphByModules(graphData, selectedModules, availableModules);
+    return filterGraphByDataNodes(moduleFiltered, ignoreDataNodes);
+  }, [graphData, selectedModules, availableModules, ignoreDataNodes]);
 
   // Convert filtered graph data to DOT string for rendering
   const filteredDotString = useMemo(() => {
-    // If all modules are selected or no modules exist, use original DOT
-    if (availableModules.length === 0 || selectedModules.size === availableModules.length) {
+    // If no module filtering and data nodes are not ignored, use original DOT
+    if (
+      availableModules.length === 0 ||
+      (selectedModules.size === availableModules.length && !ignoreDataNodes)
+    ) {
       return dotString;
     }
-    // Otherwise, generate filtered DOT (including when no modules are selected)
+    // Otherwise, generate filtered DOT (including when no modules are selected or data nodes ignored)
     return graphDataToDotString(filteredGraphData, dotString);
-  }, [filteredGraphData, dotString, availableModules.length, selectedModules.size]);
+  }, [
+    filteredGraphData,
+    dotString,
+    availableModules.length,
+    selectedModules.size,
+    ignoreDataNodes,
+  ]);
 
   // Calculate all ancestors or successors when a node is selected
   const highlightData = useMemo(() => {
@@ -122,6 +134,11 @@ function App() {
   const handleModuleSelectionChange = useCallback((modules: Set<string>) => {
     setSelectedModules(modules);
     setSelectedNode(null); // Clear selection when changing modules
+  }, []);
+
+  const handleToggleIgnoreDataNodes = useCallback(() => {
+    setIgnoreDataNodes(prev => !prev);
+    setSelectedNode(null);
   }, []);
 
   // Generate info message
@@ -172,6 +189,8 @@ function App() {
         onToggleDarkMode={handleToggleDarkMode}
         showSuccessors={showSuccessors}
         onToggleSuccessors={handleToggleSuccessors}
+        ignoreDataNodes={ignoreDataNodes}
+        onToggleIgnoreDataNodes={handleToggleIgnoreDataNodes}
         availableModules={availableModules}
         selectedModules={selectedModules}
         onModuleSelectionChange={handleModuleSelectionChange}

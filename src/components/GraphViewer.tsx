@@ -13,7 +13,6 @@ export default function GraphViewer({
 }: GraphViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
-  const [isRendering, setIsRendering] = useState(false);
   const [graphRendered, setGraphRendered] = useState(false);
 
   const setupInteractivity = useCallback(() => {
@@ -106,68 +105,69 @@ export default function GraphViewer({
   }, []);
 
   useEffect(() => {
-    if (!containerRef.current || !dotString.trim()) return;
+    if (!containerRef.current || !dotString.trim()) {
+      setGraphRendered(false);
+      return;
+    }
 
-    setIsRendering(true);
     setError(null);
     setGraphRendered(false);
 
-    try {
-      // Modify DOT string for layout if needed
-      let modifiedDot = dotString;
-      const actualEngine =
-        layoutEngine === 'dot-lr' || layoutEngine === 'dot-rl' ? 'dot' : layoutEngine;
+    requestAnimationFrame(() => {
+      try {
+        // Modify DOT string for layout if needed
+        let modifiedDot = dotString;
+        const actualEngine =
+          layoutEngine === 'dot-lr' || layoutEngine === 'dot-rl' ? 'dot' : layoutEngine;
 
-      // First, remove any existing rankdir statements (with or without quotes)
-      modifiedDot = dotString.replace(/rankdir\s*=\s*"?(TB|LR|BT|RL)"?\s*;?/gi, '');
+        // First, remove any existing rankdir statements (with or without quotes)
+        modifiedDot = dotString.replace(/rankdir\s*=\s*"?(TB|LR|BT|RL)"?\s*;?/gi, '');
 
-      if (layoutEngine === 'dot-lr') {
-        // Insert rankdir=LR for Left-to-Right layout
-        modifiedDot = modifiedDot.replace(
-          /((?:di)?graph\s+(?:[^\s{]+\s*)?\{)/i,
-          '$1\n  rankdir=LR;'
-        );
-      } else if (layoutEngine === 'dot-rl') {
-        // Insert rankdir=RL for Right-to-Left layout
-        modifiedDot = modifiedDot.replace(
-          /((?:di)?graph\s+(?:[^\s{]+\s*)?\{)/i,
-          '$1\n  rankdir=RL;'
-        );
-      } else {
-        // For top-to-bottom, insert rankdir=TB
-        modifiedDot = modifiedDot.replace(
-          /((?:di)?graph\s+(?:[^\s{]+\s*)?\{)/i,
-          '$1\n  rankdir=TB;'
-        );
-      }
+        if (layoutEngine === 'dot-lr') {
+          // Insert rankdir=LR for Left-to-Right layout
+          modifiedDot = modifiedDot.replace(
+            /((?:di)?graph\s+(?:[^\s{]+\s*)?\{)/i,
+            '$1\n  rankdir=LR;'
+          );
+        } else if (layoutEngine === 'dot-rl') {
+          // Insert rankdir=RL for Right-to-Left layout
+          modifiedDot = modifiedDot.replace(
+            /((?:di)?graph\s+(?:[^\s{]+\s*)?\{)/i,
+            '$1\n  rankdir=RL;'
+          );
+        } else {
+          // For top-to-bottom, insert rankdir=TB
+          modifiedDot = modifiedDot.replace(
+            /((?:di)?graph\s+(?:[^\s{]+\s*)?\{)/i,
+            '$1\n  rankdir=TB;'
+          );
+        }
 
-      const gv = graphviz(containerRef.current, {
-        useWorker: false,
-        zoom: true,
-        zoomScaleExtent: [0.1, 50],
-      })
-        .engine(actualEngine)
-        .onerror(err => {
-          console.error('Graphviz error:', err);
-          setError(`Rendering error: ${err}`);
-          setIsRendering(false);
+        const gv = graphviz(containerRef.current, {
+          useWorker: false,
+          zoom: true,
+          zoomScaleExtent: [0.1, 50],
+        })
+          .engine(actualEngine)
+          .onerror(err => {
+            console.error('Graphviz error:', err);
+            setError(`Rendering error: ${err}`);
+          });
+
+        gv.renderDot(modifiedDot).on('end', () => {
+          setGraphRendered(true);
+          updateSvgBackground();
+          setupInteractivity();
+          // Apply highlighting after a short delay to ensure DOM is ready
+          setTimeout(() => {
+            applyHighlighting();
+          }, 50);
         });
-
-      gv.renderDot(modifiedDot).on('end', () => {
-        setIsRendering(false);
-        setGraphRendered(true);
-        updateSvgBackground();
-        setupInteractivity();
-        // Apply highlighting after a short delay to ensure DOM is ready
-        setTimeout(() => {
-          applyHighlighting();
-        }, 50);
-      });
-    } catch (err) {
-      console.error('Error rendering graph:', err);
-      setError(`Failed to render: ${err instanceof Error ? err.message : 'Unknown error'}`);
-      setIsRendering(false);
-    }
+      } catch (err) {
+        console.error('Error rendering graph:', err);
+        setError(`Failed to render: ${err instanceof Error ? err.message : 'Unknown error'}`);
+      }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dotString, layoutEngine, setupInteractivity, updateSvgBackground]);
 
@@ -203,12 +203,6 @@ export default function GraphViewer({
 
   return (
     <div className="relative w-full h-full bg-white dark:bg-gray-900 rounded-lg shadow-inner transition-colors">
-      {isRendering && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-50/75 dark:bg-gray-800/90 backdrop-blur-sm z-10">
-          <div className="text-gray-600 dark:text-gray-300">Rendering graph...</div>
-        </div>
-      )}
-
       {error && (
         <div className="absolute top-4 left-4 right-4 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-300 px-4 py-3 rounded z-20">
           <strong className="font-bold">Error: </strong>

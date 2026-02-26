@@ -180,6 +180,41 @@ export function filterGraphByModules(
   };
 }
 
+function isDataNode(nodeId: string): boolean {
+  return nodeId.startsWith('data.') || nodeId.includes('.data.');
+}
+
+export function filterGraphByDataNodes(graphData: GraphData, ignoreDataNodes: boolean): GraphData {
+  if (!ignoreDataNodes) {
+    return graphData;
+  }
+
+  const filteredNodes = new Map<string, GraphNode>();
+  graphData.nodes.forEach((node, nodeId) => {
+    if (!isDataNode(nodeId)) {
+      filteredNodes.set(nodeId, node);
+    }
+  });
+
+  const filteredEdges = graphData.edges.filter(
+    edge => filteredNodes.has(edge.from) && filteredNodes.has(edge.to)
+  );
+
+  const filteredAdjacencyList = new Map<string, string[]>();
+  filteredEdges.forEach(edge => {
+    if (!filteredAdjacencyList.has(edge.to)) {
+      filteredAdjacencyList.set(edge.to, []);
+    }
+    filteredAdjacencyList.get(edge.to)!.push(edge.from);
+  });
+
+  return {
+    nodes: filteredNodes,
+    edges: filteredEdges,
+    adjacencyList: filteredAdjacencyList,
+  };
+}
+
 /**
  * Convert GraphData back to a DOT string
  * Preserves subgraph structures from the original DOT
