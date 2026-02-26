@@ -18,7 +18,7 @@ import type { LayoutEngine } from './types/graph.types';
 function App() {
   const [dotString, setDotString] = useState(EXAMPLE_GRAPH);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const [layoutEngine, setLayoutEngine] = useState<LayoutEngine>('dot');
+  const [layoutEngine, setLayoutEngine] = useState<LayoutEngine>('dot-lr');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuccessors, setShowSuccessors] = useState(false);
   const [selectedModules, setSelectedModules] = useState<Set<string>>(new Set());

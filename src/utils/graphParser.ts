@@ -208,7 +208,7 @@ export function graphDataToDotString(graphData: GraphData, originalDot: string):
   }
 
   // Extract node default attributes
-  const nodeAttrMatch = originalDot.match(/node\s*\[[^\]]+\];/i);
+  const nodeAttrMatch = originalDot.match(/node\s*\[[^\]]+\];?/i);
   if (nodeAttrMatch) {
     globalSettings.push(`  ${nodeAttrMatch[0]}`);
   }
