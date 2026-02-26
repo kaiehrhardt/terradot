@@ -97,7 +97,7 @@ function App() {
 
   // Handle node click
   const handleNodeClick = useCallback((nodeId: string) => {
-    setSelectedNode(nodeId);
+    setSelectedNode(prev => (prev === nodeId ? null : nodeId));
   }, []);
 
   // Handle layout change
