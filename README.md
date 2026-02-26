@@ -2,7 +2,7 @@
 
 <img src="public/logo.png" alt="TerraDot Logo" width="400">
 
-# TerraDot - Interactive DOT Graph Viewer
+# TerraDot - Interactive Terraform/OpenTofu/DOT Graph Viewer
 
 An interactive web service for visualizing and exploring Graphviz DOT graphs.
 

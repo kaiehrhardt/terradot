@@ -1,4 +1,4 @@
-import type { GraphData, GraphEdge } from '../types/graph.types';
+import type { GraphData, GraphEdge, GraphNode } from '../types/graph.types';
 
 /**
  * Parse DOT string to extract graph structure
@@ -43,16 +43,272 @@ export function parseDotString(dotString: string): GraphData {
   // Extract standalone nodes (nodes without edges)
   // Match: "quoted node" [attributes] or unquoted_node [attributes]
   // Must be at start of line (after optional whitespace) to avoid matching edge labels
+  // Exclude global attribute declarations (node, edge, graph)
   const nodeRegex = /^\s*("(?:[^"\\]|\\.)+?"|\w+)\s*\[[^\]]*\]/gm;
   while ((match = nodeRegex.exec(cleanDot)) !== null) {
     // Remove quotes if present
     const nodeId = match[1].replace(/^"|"$/g, '');
+
+    // Skip global attribute declarations
+    if (nodeId === 'node' || nodeId === 'edge' || nodeId === 'graph' || nodeId === 'subgraph') {
+      continue;
+    }
+
     if (!nodes.has(nodeId)) {
       nodes.set(nodeId, { id: nodeId });
     }
   }
 
   return { nodes, edges, adjacencyList };
+}
+
+/**
+ * Extract all unique modules from the graph nodes
+ * Supports both top-level and nested modules
+ * Examples:
+ *   - "module.vpc" -> ["vpc"]
+ *   - "module.eks_managed_node_group.module.user_data" -> ["eks_managed_node_group", "eks_managed_node_group.module.user_data"]
+ */
+export function extractModules(graphData: GraphData): string[] {
+  const modules = new Set<string>();
+
+  graphData.nodes.forEach((_, nodeId) => {
+    // Match all module patterns in the node ID
+    // Handles: module.name, module.name.module.nested, etc.
+    const moduleMatches = nodeId.matchAll(/module\.([a-zA-Z0-9_]+(?:\.module\.[a-zA-Z0-9_]+)*)/g);
+
+    for (const match of moduleMatches) {
+      const fullModulePath = match[1];
+
+      // Add all module path prefixes for any nesting depth
+      // Example: a.module.b.module.c -> ["a", "a.module.b", "a.module.b.module.c"]
+      const parts = fullModulePath.split('.module.');
+      let prefix = '';
+      for (let i = 0; i < parts.length; i++) {
+        prefix = prefix ? `${prefix}.module.${parts[i]}` : parts[i];
+        modules.add(prefix);
+      }
+    }
+  });
+
+  return Array.from(modules).sort();
+}
+
+/**
+ * Check if a node belongs to a specific module
+ * Supports matching both exact module names and parent modules
+ */
+function extractNodeModulePath(nodeId: string): string | null {
+  const parts: string[] = [];
+  let remaining = nodeId;
+
+  while (remaining.startsWith('module.')) {
+    const withoutPrefix = remaining.slice('module.'.length);
+    const nextDelimiter = withoutPrefix.indexOf('.');
+    if (nextDelimiter === -1) return null;
+
+    const moduleName = withoutPrefix.slice(0, nextDelimiter);
+    parts.push(moduleName);
+    remaining = withoutPrefix.slice(nextDelimiter + 1);
+
+    if (!remaining.startsWith('module.')) {
+      break;
+    }
+  }
+
+  if (parts.length === 0) return null;
+  return parts.join('.module.');
+}
+
+export function nodeMatchesModule(nodeId: string, moduleName: string): boolean {
+  const path = extractNodeModulePath(nodeId);
+  if (!path) return false;
+  return path === moduleName;
+}
+
+/**
+ * Filter graph data to only include nodes and edges for selected modules
+ * If no modules are selected or all are selected, returns the original graph
+ */
+export function filterGraphByModules(
+  graphData: GraphData,
+  selectedModules: Set<string>,
+  allModules: string[]
+): GraphData {
+  // If no modules exist or all modules are selected, return original graph
+  if (allModules.length === 0 || selectedModules.size === allModules.length) {
+    return graphData;
+  }
+
+  // If no modules are selected, only show root nodes (nodes without modules)
+  // This is handled by the filtering logic below
+
+  // Filter nodes
+  const filteredNodes = new Map<string, GraphNode>();
+  graphData.nodes.forEach((node, nodeId) => {
+    // Check if node belongs to any selected module
+    const belongsToSelectedModule = Array.from(selectedModules).some(moduleName =>
+      nodeMatchesModule(nodeId, moduleName)
+    );
+
+    // Also include nodes that don't belong to any module (e.g., root nodes)
+    const hasNoModule = !allModules.some(moduleName => nodeMatchesModule(nodeId, moduleName));
+
+    if (belongsToSelectedModule || hasNoModule) {
+      filteredNodes.set(nodeId, node);
+    }
+  });
+
+  // Filter edges - only keep edges where both nodes are in the filtered set
+  const filteredEdges = graphData.edges.filter(
+    edge => filteredNodes.has(edge.from) && filteredNodes.has(edge.to)
+  );
+
+  // Rebuild adjacency list
+  const filteredAdjacencyList = new Map<string, string[]>();
+  filteredEdges.forEach(edge => {
+    if (!filteredAdjacencyList.has(edge.to)) {
+      filteredAdjacencyList.set(edge.to, []);
+    }
+    filteredAdjacencyList.get(edge.to)!.push(edge.from);
+  });
+
+  return {
+    nodes: filteredNodes,
+    edges: filteredEdges,
+    adjacencyList: filteredAdjacencyList,
+  };
+}
+
+/**
+ * Convert GraphData back to a DOT string
+ * Preserves subgraph structures from the original DOT
+ */
+export function graphDataToDotString(graphData: GraphData, originalDot: string): string {
+  // If no nodes, return empty graph
+  if (graphData.nodes.size === 0) {
+    return 'digraph Empty { }';
+  }
+
+  // Extract graph name from original DOT
+  const nameMatch = originalDot.match(/(?:di)?graph\s+([^\s{]+)/i);
+  const graphName = nameMatch ? nameMatch[1] : 'G';
+
+  // Start building the new DOT string
+  const lines: string[] = [];
+  lines.push(`digraph ${graphName} {`);
+
+  // Extract and preserve global settings (rankdir, node, edge declarations)
+  const globalSettings: string[] = [];
+
+  // Extract rankdir
+  const rankdirMatch = originalDot.match(/rankdir\s*=\s*"?(TB|LR|BT|RL)"?\s*;?/i);
+  if (rankdirMatch) {
+    globalSettings.push(`  rankdir = "${rankdirMatch[1]}";`);
+  }
+
+  // Extract node default attributes
+  const nodeAttrMatch = originalDot.match(/node\s*\[[^\]]+\];/i);
+  if (nodeAttrMatch) {
+    globalSettings.push(`  ${nodeAttrMatch[0]}`);
+  }
+
+  // Extract edge default attributes
+  const edgeAttrMatch = originalDot.match(/edge\s*\[[^\]]+\];/i);
+  if (edgeAttrMatch) {
+    globalSettings.push(`  ${edgeAttrMatch[0]}`);
+  }
+
+  if (globalSettings.length > 0) {
+    lines.push(...globalSettings);
+  }
+
+  // Parse subgraphs from original DOT
+  const subgraphRegex = /subgraph\s+"([^"]+)"\s*\{\s*label\s*=\s*"([^"]+)"/g;
+  const allSubgraphs = new Map<string, { clusterId: string; label: string }>();
+
+  let subgraphMatch;
+  while ((subgraphMatch = subgraphRegex.exec(originalDot)) !== null) {
+    const clusterId = subgraphMatch[1];
+    const label = subgraphMatch[2];
+    allSubgraphs.set(label, { clusterId, label });
+  }
+
+  // Sort subgraph labels by length (longest first) to match nested modules first
+  const sortedSubgraphLabels = Array.from(allSubgraphs.entries()).sort(
+    (a, b) => b[0].length - a[0].length
+  );
+
+  // Group nodes by their module/subgraph
+  const nodesBySubgraph = new Map<string, string[]>();
+  const rootNodes: string[] = [];
+
+  graphData.nodes.forEach((_, nodeId) => {
+    // Check if this node belongs to a subgraph
+    let foundSubgraph = false;
+
+    for (const [label, _info] of sortedSubgraphLabels) {
+      // Extract module name from label (e.g., "module.eks_managed_node_group")
+      if (nodeId.startsWith(label + '.')) {
+        if (!nodesBySubgraph.has(label)) {
+          nodesBySubgraph.set(label, []);
+        }
+        nodesBySubgraph.get(label)!.push(nodeId);
+        foundSubgraph = true;
+        break;
+      }
+    }
+
+    if (!foundSubgraph) {
+      rootNodes.push(nodeId);
+    }
+  });
+
+  // Add root-level node declarations
+  if (rootNodes.length > 0) {
+    lines.push('');
+    rootNodes.forEach(nodeId => {
+      // Extract label from original if it exists
+      const labelMatch = originalDot.match(
+        new RegExp(`"${nodeId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"\\s*\\[label="([^"]+)"\\]`)
+      );
+      const label = labelMatch ? labelMatch[1] : nodeId;
+      lines.push(`  "${nodeId}" [label="${label}"];`);
+    });
+  }
+
+  // Add subgraphs with their nodes (only subgraphs that have nodes)
+  nodesBySubgraph.forEach((nodes, label) => {
+    const info = allSubgraphs.get(label);
+    if (!info || nodes.length === 0) return;
+
+    lines.push('');
+    lines.push(`  subgraph "${info.clusterId}" {`);
+    lines.push(`    label = "${info.label}"`);
+    lines.push(`    fontname = "sans-serif"`);
+
+    nodes.forEach(nodeId => {
+      // Extract label from original if it exists
+      const labelMatch = originalDot.match(
+        new RegExp(`"${nodeId.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"\\s*\\[label="([^"]+)"\\]`)
+      );
+      const label = labelMatch ? labelMatch[1] : nodeId.split('.').pop() || nodeId;
+      lines.push(`    "${nodeId}" [label="${label}"];`);
+    });
+
+    lines.push('  }');
+  });
+
+  // Add edges
+  if (graphData.edges.length > 0) {
+    lines.push('');
+    graphData.edges.forEach(edge => {
+      lines.push(`  "${edge.from}" -> "${edge.to}";`);
+    });
+  }
+
+  lines.push('}');
+  return lines.join('\n');
 }
 
 /**

@@ -8,6 +8,9 @@ import {
   findAllSuccessors,
   findRootNodes,
   parseDotString,
+  extractModules,
+  filterGraphByModules,
+  graphDataToDotString,
 } from './utils/graphParser';
 import { EXAMPLE_GRAPH } from './utils/examples';
 import type { LayoutEngine } from './types/graph.types';
@@ -18,6 +21,7 @@ function App() {
   const [layoutEngine, setLayoutEngine] = useState<LayoutEngine>('dot');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuccessors, setShowSuccessors] = useState(false);
+  const [selectedModules, setSelectedModules] = useState<Set<string>>(new Set());
 
   // Dark mode state with localStorage persistence
   const [darkMode, setDarkMode] = useState(() => {
@@ -55,15 +59,41 @@ function App() {
     }
   }, [dotString]);
 
+  // Extract available modules from the graph
+  const availableModules = useMemo(() => {
+    return extractModules(graphData);
+  }, [graphData]);
+
+  // Initialize selected modules when available modules change
+  useEffect(() => {
+    // Select all modules by default
+    setSelectedModules(new Set(availableModules));
+  }, [availableModules]);
+
+  // Filter graph data based on selected modules
+  const filteredGraphData = useMemo(() => {
+    return filterGraphByModules(graphData, selectedModules, availableModules);
+  }, [graphData, selectedModules, availableModules]);
+
+  // Convert filtered graph data to DOT string for rendering
+  const filteredDotString = useMemo(() => {
+    // If all modules are selected or no modules exist, use original DOT
+    if (availableModules.length === 0 || selectedModules.size === availableModules.length) {
+      return dotString;
+    }
+    // Otherwise, generate filtered DOT (including when no modules are selected)
+    return graphDataToDotString(filteredGraphData, dotString);
+  }, [filteredGraphData, dotString, availableModules.length, selectedModules.size]);
+
   // Calculate all ancestors or successors when a node is selected
   const highlightData = useMemo(() => {
-    if (!selectedNode || graphData.nodes.size === 0) {
+    if (!selectedNode || filteredGraphData.nodes.size === 0) {
       return { nodes: new Set<string>(), edges: new Set<string>() };
     }
     return showSuccessors
-      ? findAllSuccessors(selectedNode, graphData)
-      : findAllAncestors(selectedNode, graphData);
-  }, [selectedNode, graphData, showSuccessors]);
+      ? findAllSuccessors(selectedNode, filteredGraphData)
+      : findAllAncestors(selectedNode, filteredGraphData);
+  }, [selectedNode, filteredGraphData, showSuccessors]);
 
   // Handle node click
   const handleNodeClick = useCallback((nodeId: string) => {
@@ -88,11 +118,17 @@ function App() {
     setSearchQuery('');
   }, []);
 
+  // Handle module selection change
+  const handleModuleSelectionChange = useCallback((modules: Set<string>) => {
+    setSelectedModules(modules);
+    setSelectedNode(null); // Clear selection when changing modules
+  }, []);
+
   // Generate info message
   const highlightedNodeInfo = useMemo(() => {
     if (!selectedNode) return undefined;
 
-    const roots = findRootNodes(graphData);
+    const roots = findRootNodes(filteredGraphData);
     const highlightCount = highlightData.nodes.size;
 
     if (roots.includes(selectedNode)) {
@@ -106,7 +142,7 @@ function App() {
     }
 
     return `"${selectedNode}" (isolated node)`;
-  }, [selectedNode, graphData, highlightData, showSuccessors]);
+  }, [selectedNode, filteredGraphData, highlightData, showSuccessors]);
 
   return (
     <div className="h-screen flex flex-col bg-gray-100 dark:bg-gray-900 transition-colors">
@@ -115,7 +151,9 @@ function App() {
         <div className="flex items-center gap-3">
           <img src="/favicon.svg" alt="TerraDot Logo" className="h-12 w-12" />
           <div>
-            <h1 className="text-2xl font-bold">TerraDot - Interactive DOT Graph Viewer</h1>
+            <h1 className="text-2xl font-bold">
+              TerraDot - Interactive Terraform/OpenTofu/DOT Graph Viewer
+            </h1>
             <p className="text-blue-100 dark:text-blue-200 text-sm mt-1">
               Visualize and explore Graphviz DOT graphs • Click nodes to highlight all ancestor
               paths
@@ -135,6 +173,9 @@ function App() {
         onToggleDarkMode={handleToggleDarkMode}
         showSuccessors={showSuccessors}
         onToggleSuccessors={handleToggleSuccessors}
+        availableModules={availableModules}
+        selectedModules={selectedModules}
+        onModuleSelectionChange={handleModuleSelectionChange}
       />
 
       {/* Main Content */}
@@ -152,7 +193,7 @@ function App() {
           }
           rightPanel={
             <GraphViewer
-              dotString={dotString}
+              dotString={filteredDotString}
               onNodeClick={handleNodeClick}
               highlightedNodes={highlightData.nodes}
               highlightedEdges={highlightData.edges}
