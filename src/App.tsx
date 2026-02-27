@@ -175,11 +175,12 @@ function App() {
           <img src="/favicon.svg" alt="TerraDot Logo" className="h-12 w-12" />
           <div>
             <h1 className="text-2xl font-bold">
-              TerraDot - Interactive Terraform/OpenTofu/DOT Graph Viewer
+              TerraDot - Interactive Terraform / OpenTofu / Dot Graph Viewer
             </h1>
             <p className="text-blue-100 dark:text-blue-200 text-sm mt-1">
-              Visualize and explore Graphviz DOT graphs • Click nodes to highlight all ancestor
-              paths
+              Visualize and explore your Terraform / OpenTofu dependency graphs with ease. Click on
+              nodes to see their ancestors or successors, search for specific nodes, and filter by
+              modules or data nodes. Perfect for understanding complex infrastructure paths.
             </p>
           </div>
         </div>
@@ -244,8 +245,37 @@ function App() {
       )}
 
       <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 px-6 py-3 text-sm text-gray-600 dark:text-gray-400 transition-colors">
-        <div className="text-center">
-          Built with React, TypeScript, D3-Graphviz, and Tailwind CSS • Powered by Bun
+        <div className="flex flex-col items-center justify-center gap-2 text-center">
+          <div className="flex flex-wrap items-center justify-center gap-3 text-xs">
+            <a
+              className="hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              href="https://github.com/kaiehrhardt/terradot#readme"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Docs
+            </a>
+            <span className="text-gray-300 dark:text-gray-600">•</span>
+            <a
+              className="hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              href="https://github.com/kaiehrhardt/terradot"
+              target="_blank"
+              rel="noreferrer"
+            >
+              GitHub
+            </a>
+            <span className="text-gray-300 dark:text-gray-600">•</span>
+            <a
+              className="hover:text-gray-900 dark:hover:text-gray-100 transition-colors"
+              href="https://github.com/kaiehrhardt/terradot/blob/main/LICENSE"
+              target="_blank"
+              rel="noreferrer"
+            >
+              License
+            </a>
+            <span className="text-gray-300 dark:text-gray-600">•</span>
+            <span className="text-gray-500 dark:text-gray-400">{__APP_VERSION__}</span>
+          </div>
         </div>
       </footer>
     </div>
