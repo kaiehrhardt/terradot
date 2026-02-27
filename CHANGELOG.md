@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/kaiehrhardt/terradot/compare/1.1.0...1.1.1) (2026-02-27)
+
+
+### Bug Fixes
+
+* release trigger ([c750357](https://github.com/kaiehrhardt/terradot/commit/c7503570ae9cd763d097348046aa8bcc486dba0a))
+
 # [1.1.0](https://github.com/kaiehrhardt/terradot/compare/1.0.0...1.1.0) (2026-02-27)
 
 
