@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/kaiehrhardt/terradot/compare/1.0.0...1.1.0) (2026-02-27)
+
+
+### Features
+
+* restore header/footer details and version badge ([7656560](https://github.com/kaiehrhardt/terradot/commit/7656560c79548ddcb6d82476e6ff4301b2e7544a))
+
 # 1.0.0 (2026-02-27)
 
 
