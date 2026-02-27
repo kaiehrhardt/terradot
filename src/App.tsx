@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import GraphViewer from './components/GraphViewer';
 import DotInputEditor from './components/DotInputEditor';
 import GraphControls from './components/GraphControls';
@@ -24,6 +24,7 @@ function App() {
   const [showSuccessors, setShowSuccessors] = useState(false);
   const [selectedModules, setSelectedModules] = useState<Set<string>>(new Set());
   const [ignoreDataNodes, setIgnoreDataNodes] = useState(false);
+  const graphRenderStartRef = useRef<(() => void) | null>(null);
 
   // Dark mode state with localStorage persistence
   const [darkMode, setDarkMode] = useState(() => {
@@ -48,6 +49,7 @@ function App() {
 
   // Toggle between ancestors and successors
   const handleToggleSuccessors = useCallback(() => {
+    graphRenderStartRef.current?.();
     setShowSuccessors((prev: boolean) => !prev);
   }, []);
 
@@ -114,6 +116,7 @@ function App() {
 
   // Handle layout change
   const handleLayoutChange = useCallback((engine: LayoutEngine) => {
+    graphRenderStartRef.current?.();
     setLayoutEngine(engine);
   }, []);
 
@@ -125,6 +128,7 @@ function App() {
 
   // Load example graph
   const handleLoadExample = useCallback(() => {
+    graphRenderStartRef.current?.();
     setDotString(EXAMPLE_GRAPH);
     setSelectedNode(null);
     setSearchQuery('');
@@ -132,11 +136,13 @@ function App() {
 
   // Handle module selection change
   const handleModuleSelectionChange = useCallback((modules: Set<string>) => {
+    graphRenderStartRef.current?.();
     setSelectedModules(modules);
     setSelectedNode(null); // Clear selection when changing modules
   }, []);
 
   const handleToggleIgnoreDataNodes = useCallback(() => {
+    graphRenderStartRef.current?.();
     setIgnoreDataNodes(prev => !prev);
     setSelectedNode(null);
   }, []);
@@ -205,13 +211,19 @@ function App() {
           leftPanel={
             <DotInputEditor
               value={dotString}
-              onChange={setDotString}
+              onChange={value => {
+                graphRenderStartRef.current?.();
+                setDotString(value);
+              }}
               onLoadExample={handleLoadExample}
             />
           }
           rightPanel={
             <GraphViewer
               dotString={filteredDotString}
+              onRenderStartReady={start => {
+                graphRenderStartRef.current = start;
+              }}
               onNodeClick={handleNodeClick}
               highlightedNodes={highlightData.nodes}
               highlightedEdges={highlightData.edges}
