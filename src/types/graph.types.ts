@@ -16,9 +16,19 @@ export interface GraphData {
 
 export type LayoutEngine = 'dot' | 'dot-lr' | 'dot-rl';
 
+export type GraphExportFormat = 'svg' | 'png';
+export type GraphExportSource = 'current' | 'raw';
+
+export interface GraphExportOptions {
+  format: GraphExportFormat;
+  source: GraphExportSource;
+}
+
 export interface GraphViewerProps {
   dotString: string;
   onRenderStartReady?: (start: () => void) => void;
+  onRenderStatusChange?: (ready: boolean) => void;
+  onExportReady?: (exporter: (options: GraphExportOptions) => void) => void;
   onNodeClick?: (_nodeId: string) => void;
   highlightedNodes?: Set<string>;
   highlightedEdges?: Set<string>;

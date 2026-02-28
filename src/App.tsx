@@ -14,7 +14,7 @@ import {
   graphDataToDotString,
 } from './utils/graphParser';
 import { EXAMPLE_GRAPH } from './utils/examples';
-import type { LayoutEngine } from './types/graph.types';
+import type { GraphExportOptions, LayoutEngine } from './types/graph.types';
 
 function App() {
   const [dotString, setDotString] = useState(EXAMPLE_GRAPH);
@@ -25,6 +25,8 @@ function App() {
   const [selectedModules, setSelectedModules] = useState<Set<string>>(new Set());
   const [ignoreDataNodes, setIgnoreDataNodes] = useState(false);
   const graphRenderStartRef = useRef<(() => void) | null>(null);
+  const graphExportRef = useRef<((options: GraphExportOptions) => void) | null>(null);
+  const [graphReady, setGraphReady] = useState(false);
 
   // Dark mode state with localStorage persistence
   const [darkMode, setDarkMode] = useState(() => {
@@ -147,6 +149,10 @@ function App() {
     setSelectedNode(null);
   }, []);
 
+  const handleExport = useCallback((options: GraphExportOptions) => {
+    graphExportRef.current?.(options);
+  }, []);
+
   // Generate info message
   const highlightedNodeInfo = useMemo(() => {
     if (!selectedNode) return undefined;
@@ -201,6 +207,8 @@ function App() {
         availableModules={availableModules}
         selectedModules={selectedModules}
         onModuleSelectionChange={handleModuleSelectionChange}
+        onExport={handleExport}
+        exportDisabled={!graphReady}
       />
 
       {/* Main Content */}
@@ -224,6 +232,10 @@ function App() {
               dotString={filteredDotString}
               onRenderStartReady={start => {
                 graphRenderStartRef.current = start;
+              }}
+              onRenderStatusChange={setGraphReady}
+              onExportReady={exporter => {
+                graphExportRef.current = exporter;
               }}
               onNodeClick={handleNodeClick}
               highlightedNodes={highlightData.nodes}

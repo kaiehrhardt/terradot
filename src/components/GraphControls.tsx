@@ -1,4 +1,10 @@
-import type { LayoutEngine } from '../types/graph.types';
+import { useState } from 'react';
+import type {
+  GraphExportFormat,
+  GraphExportOptions,
+  GraphExportSource,
+  LayoutEngine,
+} from '../types/graph.types';
 import ModuleFilter from './ModuleFilter';
 
 interface GraphControlsProps {
@@ -15,6 +21,8 @@ interface GraphControlsProps {
   availableModules: string[];
   selectedModules: Set<string>;
   onModuleSelectionChange: (modules: Set<string>) => void;
+  onExport: (options: GraphExportOptions) => void;
+  exportDisabled?: boolean;
 }
 
 const layoutOptions: { value: LayoutEngine; label: string; description: string }[] = [
@@ -37,7 +45,16 @@ export default function GraphControls({
   availableModules,
   selectedModules,
   onModuleSelectionChange,
+  onExport,
+  exportDisabled = false,
 }: GraphControlsProps) {
+  const [exportFormat, setExportFormat] = useState<GraphExportFormat>('svg');
+  const [exportSource, setExportSource] = useState<GraphExportSource>('current');
+
+  const handleExport = () => {
+    onExport({ format: exportFormat, source: exportSource });
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 shadow-sm transition-colors">
       <div className="flex flex-wrap items-center gap-4">
@@ -83,6 +100,42 @@ export default function GraphControls({
               </option>
             ))}
           </select>
+        </div>
+
+        {/* Export */}
+        <div className="flex items-center gap-2">
+          <label
+            htmlFor="export-format"
+            className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap"
+          >
+            Export:
+          </label>
+          <select
+            id="export-format"
+            value={exportFormat}
+            onChange={e => setExportFormat(e.target.value as GraphExportFormat)}
+            className="px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
+          >
+            <option value="svg">SVG</option>
+            <option value="png">PNG</option>
+          </select>
+          <select
+            id="export-source"
+            value={exportSource}
+            onChange={e => setExportSource(e.target.value as GraphExportSource)}
+            className="px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
+          >
+            <option value="current">Aktuell</option>
+            <option value="raw">Roh</option>
+          </select>
+          <button
+            type="button"
+            onClick={handleExport}
+            disabled={exportDisabled}
+            className="px-3 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
+          >
+            Download
+          </button>
         </div>
 
         {/* Dark Mode Toggle */}

@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { graphviz } from 'd3-graphviz';
 import { select } from 'd3-selection';
-import type { GraphViewerProps } from '../types/graph.types';
+import type { GraphExportOptions, GraphViewerProps } from '../types/graph.types';
 
 export default function GraphViewer({
   dotString,
   onRenderStartReady,
+  onRenderStatusChange,
+  onExportReady,
   onNodeClick,
   highlightedNodes = new Set(),
   highlightedEdges = new Set(),
@@ -22,17 +24,230 @@ export default function GraphViewer({
   const renderDelayRef = useRef<number | null>(null);
   const MIN_OVERLAY_MS = 250;
 
+  const notifyRenderStatus = useCallback(
+    (ready: boolean) => {
+      onRenderStatusChange?.(ready);
+    },
+    [onRenderStatusChange]
+  );
+
+  const getCurrentTransform = (svg: SVGSVGElement) => {
+    const viewport = svg.querySelector('g');
+    const transform = viewport?.getAttribute('transform');
+    return transform ?? '';
+  };
+
+  const getRenderedSvg = useCallback(() => {
+    if (!containerRef.current) return null;
+    return containerRef.current.querySelector('svg');
+  }, []);
+
+  const cloneSvgForExport = (svg: SVGSVGElement, source: GraphExportOptions['source']) => {
+    const cloned = svg.cloneNode(true) as SVGSVGElement;
+    cloned.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const background = isDark ? '#111827' : 'white';
+    cloned.style.backgroundColor = background;
+
+    const style = document.createElementNS('http://www.w3.org/2000/svg', 'style');
+    style.textContent = buildExportStyles(isDark);
+    cloned.insertBefore(style, cloned.firstChild);
+
+    const width = svg.clientWidth || 1200;
+    const height = svg.clientHeight || 800;
+    cloned.setAttribute('width', `${width}`);
+    cloned.setAttribute('height', `${height}`);
+
+    const originalViewBox = svg.getAttribute('viewBox');
+
+    const viewport = cloned.querySelector('g');
+    if (viewport) {
+      if (source === 'raw') {
+        const rawViewBox = computeRawViewBox(cloned, width, height, originalViewBox);
+        cloned.setAttribute('viewBox', rawViewBox);
+        viewport.removeAttribute('transform');
+      } else {
+        if (originalViewBox) {
+          cloned.setAttribute('viewBox', originalViewBox);
+        } else {
+          cloned.setAttribute('viewBox', `0 0 ${width} ${height}`);
+        }
+        const transform = getCurrentTransform(svg);
+        if (transform) {
+          viewport.setAttribute('transform', transform);
+        }
+      }
+    }
+
+    return cloned;
+  };
+
+  const computeRawViewBox = (
+    svg: SVGSVGElement,
+    width: number,
+    height: number,
+    fallbackViewBox: string | null
+  ) => {
+    const viewport = svg.querySelector('g');
+    if (!viewport) {
+      return fallbackViewBox ?? `0 0 ${width} ${height}`;
+    }
+
+    viewport.removeAttribute('transform');
+
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'fixed';
+    wrapper.style.left = '-10000px';
+    wrapper.style.top = '-10000px';
+    wrapper.style.visibility = 'hidden';
+    wrapper.style.pointerEvents = 'none';
+    wrapper.appendChild(svg);
+    document.body.appendChild(wrapper);
+
+    let viewBox = fallbackViewBox ?? `0 0 ${width} ${height}`;
+    try {
+      const bbox = viewport.getBBox();
+      const padding = 16;
+      viewBox = `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + padding * 2} ${bbox.height + padding * 2}`;
+    } catch {
+      viewBox = fallbackViewBox ?? `0 0 ${width} ${height}`;
+    } finally {
+      wrapper.remove();
+    }
+
+    return viewBox;
+  };
+
+  const buildExportStyles = (isDark: boolean) => {
+    if (isDark) {
+      return `
+.node:not(.node-highlighted) ellipse,
+.node:not(.node-highlighted) polygon,
+.node:not(.node-highlighted) path { fill: #374151; stroke: #6b7280; }
+.node:not(.node-highlighted) text { fill: #d1d5db; }
+.edge:not(.edge-highlighted) path { stroke: #6b7280; }
+.edge:not(.edge-highlighted) polygon { stroke: #6b7280; fill: #6b7280; }
+.edge:not(.edge-highlighted) text { fill: #9ca3af; }
+.node.node-highlighted ellipse,
+.node.node-highlighted polygon,
+.node.node-highlighted path { stroke: #60a5fa; stroke-width: 4; fill: #1e40af; }
+.node.node-highlighted text { font-weight: bold; fill: #bfdbfe; }
+.edge.edge-highlighted path { stroke: #fb923c; stroke-width: 4; }
+.edge.edge-highlighted polygon { stroke: #fb923c; fill: #fb923c; }
+.edge.edge-highlighted text { fill: #fdba74; font-weight: bold; }
+.cluster polygon,
+.cluster rect { fill: #1f2937; stroke: #4b5563; stroke-width: 1.5; }
+.cluster text { fill: #e5e7eb; font-weight: 600; }
+`.trim();
+    }
+
+    return `
+.node.node-highlighted ellipse,
+.node.node-highlighted polygon,
+.node.node-highlighted path { stroke: #3b82f6; stroke-width: 3; fill: #dbeafe; }
+.node.node-highlighted text { font-weight: bold; fill: #1e40af; }
+.edge.edge-highlighted path { stroke: #ef4444; stroke-width: 3; }
+.edge.edge-highlighted polygon { stroke: #ef4444; fill: #ef4444; }
+.edge.edge-highlighted text { fill: #ef4444; font-weight: bold; }
+`.trim();
+  };
+
+  const downloadBlob = (blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+  };
+
+  const exportSvg = (options: GraphExportOptions) => {
+    const svg = getRenderedSvg();
+    if (!svg) return;
+
+    const cloned = cloneSvgForExport(svg, options.source);
+    const serializer = new XMLSerializer();
+    const svgText = serializer.serializeToString(cloned);
+    const blob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+    const filename = `terradot-graph-${options.source}.svg`;
+    downloadBlob(blob, filename);
+  };
+
+  const exportPng = (options: GraphExportOptions) => {
+    const svg = getRenderedSvg();
+    if (!svg) return;
+
+    const cloned = cloneSvgForExport(svg, options.source);
+    const serializer = new XMLSerializer();
+    const svgText = serializer.serializeToString(cloned);
+    const svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(svgBlob);
+
+    const width = svg.clientWidth || 1200;
+    const height = svg.clientHeight || 800;
+
+    const image = new Image();
+    image.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        URL.revokeObjectURL(url);
+        return;
+      }
+
+      const background = document.documentElement.classList.contains('dark') ? '#111827' : 'white';
+      ctx.fillStyle = background;
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(image, 0, 0, width, height);
+
+      canvas.toBlob(blob => {
+        if (!blob) return;
+        const filename = `terradot-graph-${options.source}.png`;
+        downloadBlob(blob, filename);
+      }, 'image/png');
+
+      URL.revokeObjectURL(url);
+    };
+
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+    };
+
+    image.src = url;
+  };
+
+  const exportGraph = useCallback(
+    (options: GraphExportOptions) => {
+      if (options.format === 'svg') {
+        exportSvg(options);
+      } else {
+        exportPng(options);
+      }
+    },
+    [getRenderedSvg]
+  );
+
   const notifyRenderStart = useCallback(() => {
     setError(null);
     setGraphRendered(false);
     setIsRendering(true);
     renderStartRef.current = window.performance.now();
     clearRenderTimeout();
-  }, []);
+    notifyRenderStatus(false);
+  }, [notifyRenderStatus]);
 
   useEffect(() => {
     onRenderStartReady?.(notifyRenderStart);
   }, [notifyRenderStart, onRenderStartReady]);
+
+  useEffect(() => {
+    onExportReady?.(exportGraph);
+  }, [exportGraph, onExportReady]);
 
   const clearRenderTimeout = () => {
     if (renderTimeoutRef.current !== null) {
@@ -135,11 +350,12 @@ export default function GraphViewer({
       setGraphRendered(false);
       setIsRendering(false);
       clearRenderTimeout();
+      notifyRenderStatus(false);
       return;
     }
 
     notifyRenderStart();
-  }, [dotString, layoutEngine, notifyRenderStart]);
+  }, [dotString, layoutEngine, notifyRenderStart, notifyRenderStatus]);
 
   useEffect(() => {
     if (!containerRef.current || !dotString.trim()) {
@@ -194,6 +410,7 @@ export default function GraphViewer({
           renderTimeoutRef.current = window.setTimeout(() => {
             setGraphRendered(true);
             setIsRendering(false);
+            notifyRenderStatus(true);
             updateSvgBackground();
             setupInteractivity();
             // Apply highlighting after a short delay to ensure DOM is ready
@@ -206,6 +423,7 @@ export default function GraphViewer({
         console.error('Error rendering graph:', err);
         setError(`Failed to render: ${err instanceof Error ? err.message : 'Unknown error'}`);
         setIsRendering(false);
+        notifyRenderStatus(false);
       }
     };
 
