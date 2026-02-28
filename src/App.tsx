@@ -51,7 +51,6 @@ function App() {
 
   // Toggle between ancestors and successors
   const handleToggleSuccessors = useCallback(() => {
-    graphRenderStartRef.current?.();
     setShowSuccessors((prev: boolean) => !prev);
   }, []);
 
