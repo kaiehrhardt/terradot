@@ -10,10 +10,6 @@ import ModuleFilter from './ModuleFilter';
 interface GraphControlsProps {
   layoutEngine: LayoutEngine;
   onLayoutChange: (layoutEngine: LayoutEngine) => void;
-  searchQuery: string;
-  onSearchChange: (searchQuery: string) => void;
-  darkMode: boolean;
-  onToggleDarkMode: () => void;
   showSuccessors: boolean;
   onToggleSuccessors: () => void;
   ignoreDataNodes: boolean;
@@ -34,10 +30,6 @@ const layoutOptions: { value: LayoutEngine; label: string; description: string }
 export default function GraphControls({
   layoutEngine,
   onLayoutChange,
-  searchQuery,
-  onSearchChange,
-  darkMode,
-  onToggleDarkMode,
   showSuccessors,
   onToggleSuccessors,
   ignoreDataNodes,
@@ -50,179 +42,126 @@ export default function GraphControls({
 }: GraphControlsProps) {
   const [exportFormat, setExportFormat] = useState<GraphExportFormat>('svg');
   const [exportSource, setExportSource] = useState<GraphExportSource>('current');
+  const selectBase =
+    'h-9 px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors shadow-sm';
+  const buttonGhost =
+    'h-9 inline-flex items-center gap-2 rounded-md bg-gray-100 dark:bg-gray-700 px-3 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition-colors';
+  const buttonPrimary =
+    'h-9 inline-flex items-center gap-2 rounded-md bg-blue-600 px-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors';
 
   const handleExport = () => {
     onExport({ format: exportFormat, source: exportSource });
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 shadow-sm transition-colors">
-      <div className="flex flex-wrap items-center gap-4">
-        {/* Search Bar */}
-        <div className="flex-1 min-w-[200px]">
-          <label htmlFor="search" className="sr-only">
-            Search nodes
-          </label>
-          <input
-            id="search"
-            type="text"
-            value={searchQuery}
-            onChange={e => onSearchChange(e.target.value)}
-            placeholder="Search nodes..."
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
-          />
-        </div>
+    <div className="flex flex-wrap items-center gap-4">
+      {/* Module Filter */}
+      <ModuleFilter
+        availableModules={availableModules}
+        selectedModules={selectedModules}
+        onSelectionChange={onModuleSelectionChange}
+      />
 
-        {/* Module Filter */}
-        <ModuleFilter
-          availableModules={availableModules}
-          selectedModules={selectedModules}
-          onSelectionChange={onModuleSelectionChange}
-        />
-
-        {/* Layout Selector */}
-        <div className="flex items-center gap-2">
-          <label
-            htmlFor="layout"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap"
-          >
-            Layout:
-          </label>
-          <select
-            id="layout"
-            value={layoutEngine}
-            onChange={e => onLayoutChange(e.target.value as LayoutEngine)}
-            className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-          >
-            {layoutOptions.map(option => (
-              <option key={option.value} value={option.value} title={option.description}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        {/* Export */}
-        <div className="flex items-center gap-2">
-          <label
-            htmlFor="export-format"
-            className="text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap"
-          >
-            Export:
-          </label>
-          <select
-            id="export-format"
-            value={exportFormat}
-            onChange={e => setExportFormat(e.target.value as GraphExportFormat)}
-            className="px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-          >
-            <option value="svg">SVG</option>
-            <option value="png">PNG</option>
-          </select>
-          <select
-            id="export-source"
-            value={exportSource}
-            onChange={e => setExportSource(e.target.value as GraphExportSource)}
-            className="px-2 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 transition-colors"
-          >
-            <option value="current">Aktuell</option>
-            <option value="raw">Roh</option>
-          </select>
-          <button
-            type="button"
-            onClick={handleExport}
-            disabled={exportDisabled}
-            className="px-3 py-2 rounded-md bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:cursor-not-allowed transition-colors"
-          >
-            Download
-          </button>
-        </div>
-
-        {/* Dark Mode Toggle */}
-        <button
-          onClick={onToggleDarkMode}
-          className="flex items-center gap-2 px-3 py-2 min-w-[88px] rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300"
-          aria-label="Toggle dark mode"
+      {/* Layout Selector */}
+      <div className="flex items-center gap-2">
+        <select
+          id="layout"
+          value={layoutEngine}
+          onChange={e => onLayoutChange(e.target.value as LayoutEngine)}
+          aria-label="Layout"
+          className={selectBase}
         >
-          {darkMode ? (
-            <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
-                />
-              </svg>
-              <span>Light</span>
-            </>
-          ) : (
-            <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
-                />
-              </svg>
-              <span>Dark</span>
-            </>
-          )}
-        </button>
+          {layoutOptions.map(option => (
+            <option key={option.value} value={option.value} title={option.description}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
 
-        {/* Predecessors/Successors Toggle */}
-        <button
-          onClick={onToggleSuccessors}
-          className="flex items-center gap-2 px-3 py-2 min-w-[132px] rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300"
-          aria-label="Toggle between predecessors and successors"
+      {/* Export */}
+      <div className="flex items-center gap-2">
+        <select
+          id="export-format"
+          value={exportFormat}
+          onChange={e => setExportFormat(e.target.value as GraphExportFormat)}
+          aria-label="Export format"
+          className={selectBase}
         >
-          {showSuccessors ? (
-            <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 7l5 5m0 0l-5 5m5-5H6"
-                />
-              </svg>
-              <span>Successors</span>
-            </>
-          ) : (
-            <>
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M11 17l-5-5m0 0l5-5m-5 5h12"
-                />
-              </svg>
-              <span>Predecessors</span>
-            </>
-          )}
-        </button>
-
-        {/* Ignore data nodes */}
-        <button
-          onClick={onToggleIgnoreDataNodes}
-          className="flex items-center gap-2 px-3 py-2 rounded-md bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors text-sm font-medium text-gray-700 dark:text-gray-300"
-          aria-label="Toggle data nodes"
+          <option value="svg">SVG</option>
+          <option value="png">PNG</option>
+        </select>
+        <select
+          id="export-source"
+          value={exportSource}
+          onChange={e => setExportSource(e.target.value as GraphExportSource)}
+          aria-label="Export source"
+          className={selectBase}
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 7h16M4 12h16M4 17h16"
-            />
-          </svg>
-          <span className="min-w-[96px] text-left">
-            {ignoreDataNodes ? 'Show data' : 'Ignore data'}
-          </span>
+          <option value="current">Current</option>
+          <option value="raw">Raw</option>
+        </select>
+        <button
+          type="button"
+          onClick={handleExport}
+          disabled={exportDisabled}
+          className={buttonPrimary}
+        >
+          Download
         </button>
       </div>
+
+      {/* Predecessors/Successors Toggle */}
+      <button
+        onClick={onToggleSuccessors}
+        className={`${buttonGhost} min-w-[132px]`}
+        aria-label="Toggle between predecessors and successors"
+      >
+        {showSuccessors ? (
+          <>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M13 7l5 5m0 0l-5 5m5-5H6"
+              />
+            </svg>
+            <span>Successors</span>
+          </>
+        ) : (
+          <>
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M11 17l-5-5m0 0l5-5m-5 5h12"
+              />
+            </svg>
+            <span>Predecessors</span>
+          </>
+        )}
+      </button>
+
+      {/* Ignore data nodes */}
+      <button
+        onClick={onToggleIgnoreDataNodes}
+        className={buttonGhost}
+        aria-label="Toggle data nodes"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M4 7h16M4 12h16M4 17h16"
+          />
+        </svg>
+        <span className="min-w-[96px] text-left">
+          {ignoreDataNodes ? 'Show data' : 'Ignore data'}
+        </span>
+      </button>
     </div>
   );
 }

@@ -176,39 +176,53 @@ function App() {
     <div className="h-screen flex flex-col bg-gray-100 dark:bg-gray-900 transition-colors">
       {/* Header */}
       <header className="bg-gradient-to-r from-blue-600 to-blue-700 dark:from-blue-800 dark:to-blue-900 text-white px-6 py-4 shadow-lg">
-        <div className="flex items-center gap-3">
-          <img src="/favicon.svg" alt="TerraDot Logo" className="h-12 w-12" />
-          <div>
-            <h1 className="text-2xl font-bold">
-              TerraDot - Interactive Terraform / OpenTofu / Dot Graph Viewer
-            </h1>
-            <p className="text-blue-100 dark:text-blue-200 text-sm mt-1">
-              Visualize and explore your Terraform / OpenTofu dependency graphs with ease. Click on
-              nodes to see their ancestors or successors, search for specific nodes, and filter by
-              modules or data nodes. Perfect for understanding complex infrastructure paths.
-            </p>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <img src="/favicon.svg" alt="TerraDot Logo" className="h-12 w-12" />
+            <div>
+              <h1 className="text-2xl font-bold">
+                TerraDot - Interactive Terraform / OpenTofu / Dot Graph Viewer
+              </h1>
+              <p className="text-blue-100 dark:text-blue-200 text-sm mt-1">
+                Visualize and explore your Terraform / OpenTofu dependency graphs with ease. Click
+                on nodes to see their ancestors or successors, search for specific nodes, and filter
+                by modules or data nodes. Perfect for understanding complex infrastructure paths.
+              </p>
+            </div>
           </div>
+          <button
+            onClick={handleToggleDarkMode}
+            className="h-9 inline-flex items-center gap-2 rounded-md bg-white/10 px-3 text-sm font-semibold text-white shadow-sm hover:bg-white/20 focus:outline-none focus:ring-2 focus:ring-white/60 transition-colors"
+            aria-label="Toggle dark mode"
+          >
+            {darkMode ? (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                  />
+                </svg>
+                <span>Light</span>
+              </>
+            ) : (
+              <>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                  />
+                </svg>
+                <span>Dark</span>
+              </>
+            )}
+          </button>
         </div>
       </header>
-
-      {/* Controls */}
-      <GraphControls
-        layoutEngine={layoutEngine}
-        onLayoutChange={handleLayoutChange}
-        searchQuery={searchQuery}
-        onSearchChange={handleSearchChange}
-        darkMode={darkMode}
-        onToggleDarkMode={handleToggleDarkMode}
-        showSuccessors={showSuccessors}
-        onToggleSuccessors={handleToggleSuccessors}
-        ignoreDataNodes={ignoreDataNodes}
-        onToggleIgnoreDataNodes={handleToggleIgnoreDataNodes}
-        availableModules={availableModules}
-        selectedModules={selectedModules}
-        onModuleSelectionChange={handleModuleSelectionChange}
-        onExport={handleExport}
-        exportDisabled={!graphReady}
-      />
 
       {/* Main Content */}
       <main className="flex-1 overflow-hidden">
@@ -227,21 +241,55 @@ function App() {
             />
           }
           rightPanel={
-            <GraphViewer
-              dotString={filteredDotString}
-              onRenderStartReady={start => {
-                graphRenderStartRef.current = start;
-              }}
-              onRenderStatusChange={setGraphReady}
-              onExportReady={exporter => {
-                graphExportRef.current = exporter;
-              }}
-              onNodeClick={handleNodeClick}
-              highlightedNodes={highlightData.nodes}
-              highlightedEdges={highlightData.edges}
-              layoutEngine={layoutEngine}
-              searchQuery={searchQuery}
-            />
+            <div className="flex h-full flex-col gap-2">
+              <div className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-6 py-4 shadow-sm transition-colors">
+                <div className="flex flex-wrap items-center gap-4">
+                  <div className="min-w-[220px] flex-1">
+                    <label htmlFor="search" className="sr-only">
+                      Search nodes
+                    </label>
+                    <input
+                      id="search"
+                      type="text"
+                      value={searchQuery}
+                      onChange={e => handleSearchChange(e.target.value)}
+                      placeholder="Search nodes..."
+                      className="h-9 w-full px-3 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 transition-colors shadow-sm"
+                    />
+                  </div>
+                  <GraphControls
+                    layoutEngine={layoutEngine}
+                    onLayoutChange={handleLayoutChange}
+                    showSuccessors={showSuccessors}
+                    onToggleSuccessors={handleToggleSuccessors}
+                    ignoreDataNodes={ignoreDataNodes}
+                    onToggleIgnoreDataNodes={handleToggleIgnoreDataNodes}
+                    availableModules={availableModules}
+                    selectedModules={selectedModules}
+                    onModuleSelectionChange={handleModuleSelectionChange}
+                    onExport={handleExport}
+                    exportDisabled={!graphReady}
+                  />
+                </div>
+              </div>
+              <div className="flex-1">
+                <GraphViewer
+                  dotString={filteredDotString}
+                  onRenderStartReady={start => {
+                    graphRenderStartRef.current = start;
+                  }}
+                  onRenderStatusChange={setGraphReady}
+                  onExportReady={exporter => {
+                    graphExportRef.current = exporter;
+                  }}
+                  onNodeClick={handleNodeClick}
+                  highlightedNodes={highlightData.nodes}
+                  highlightedEdges={highlightData.edges}
+                  layoutEngine={layoutEngine}
+                  searchQuery={searchQuery}
+                />
+              </div>
+            </div>
           }
         />
       </main>

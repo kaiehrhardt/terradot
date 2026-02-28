@@ -52,7 +52,7 @@ export default function ResizablePanels({
   return (
     <div ref={containerRef} className="flex h-full w-full">
       {/* Left Panel */}
-      <div style={{ width: `${leftWidth}%` }} className="flex-shrink-0 p-1">
+      <div style={{ width: `${leftWidth}%` }} className="flex-shrink-0 p-0">
         {leftPanel}
       </div>
 
@@ -71,7 +71,7 @@ export default function ResizablePanels({
       </div>
 
       {/* Right Panel */}
-      <div className="flex-1 p-1">{rightPanel}</div>
+      <div className="flex-1 p-0">{rightPanel}</div>
     </div>
   );
 }
