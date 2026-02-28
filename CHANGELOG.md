@@ -1,3 +1,16 @@
+# [1.2.0](https://github.com/kaiehrhardt/terradot/compare/1.1.1...1.2.0) (2026-02-28)
+
+
+### Bug Fixes
+
+* avoid loading overlay for successor toggle ([38a576e](https://github.com/kaiehrhardt/terradot/commit/38a576e18d0ca779686d04aeb2e306989fbd7eb9))
+
+
+### Features
+
+* add png/svg export ([a438856](https://github.com/kaiehrhardt/terradot/commit/a438856cb7aecb700dd3c029411bde4244b4e701))
+* align panel controls and layout ([ddf3004](https://github.com/kaiehrhardt/terradot/commit/ddf300445f67833e896a9ea57846d520fc21816d))
+
 ## [1.1.1](https://github.com/kaiehrhardt/terradot/compare/1.1.0...1.1.1) (2026-02-27)
 
 
