@@ -111,7 +111,7 @@ export default function GraphViewer({
       const padding = 16;
       viewBox = `${bbox.x - padding} ${bbox.y - padding} ${bbox.width + padding * 2} ${bbox.height + padding * 2}`;
     } catch {
-      viewBox = fallbackViewBox ?? `0 0 ${width} ${height}`;
+      // viewBox already initialized to fallback above
     } finally {
       wrapper.remove();
     }
