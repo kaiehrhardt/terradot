@@ -28,7 +28,7 @@ jobs:
       # so we explicitly set up Node 22 here — Bun still handles installs and
       # script dispatch, but the semantic-release binary picks up Node from PATH.
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
         with:
           node-version: 22
 
