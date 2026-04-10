@@ -1,3 +1,10 @@
+## [1.2.5](https://github.com/kaiehrhardt/terradot/compare/1.2.4...1.2.5) (2026-04-10)
+
+
+### Bug Fixes
+
+* remove useless viewBox reassignment in catch block ([80e673f](https://github.com/kaiehrhardt/terradot/commit/80e673f612b0b85b886d37d178b4be07ac11183d))
+
 ## [1.2.4](https://github.com/kaiehrhardt/terradot/compare/1.2.3...1.2.4) (2026-04-10)
 
 
