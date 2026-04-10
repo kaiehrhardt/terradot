@@ -1,3 +1,10 @@
+## [1.2.3](https://github.com/kaiehrhardt/terradot/compare/1.2.2...1.2.3) (2026-04-10)
+
+
+### Bug Fixes
+
+* migrate to Tailwind CSS v4 PostCSS plugin and update CSS syntax ([91a8b05](https://github.com/kaiehrhardt/terradot/commit/91a8b05e56220d11428a0809055b5d2fe40d2aa0))
+
 ## [1.2.2](https://github.com/kaiehrhardt/terradot/compare/1.2.1...1.2.2) (2026-04-10)
 
 
