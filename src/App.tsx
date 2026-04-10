@@ -4,14 +4,14 @@ import DotInputEditor from './components/DotInputEditor';
 import GraphControls from './components/GraphControls';
 import ResizablePanels from './components/ResizablePanels';
 import {
+  extractModules,
+  filterGraphByDataNodes,
+  filterGraphByModules,
   findAllAncestors,
   findAllSuccessors,
   findRootNodes,
-  parseDotString,
-  extractModules,
-  filterGraphByModules,
-  filterGraphByDataNodes,
   graphDataToDotString,
+  parseDotString,
 } from './utils/graphParser';
 import { EXAMPLE_GRAPH } from './utils/examples';
 import type { GraphExportOptions, LayoutEngine } from './types/graph.types';
@@ -69,11 +69,13 @@ function App() {
     return extractModules(graphData);
   }, [graphData]);
 
-  // Initialize selected modules when available modules change
-  useEffect(() => {
-    // Select all modules by default
+  // Reset selected modules when availableModules changes (update during render - React recommended pattern)
+  const [prevAvailableModulesKey, setPrevAvailableModulesKey] = useState('');
+  const currentAvailableModulesKey = availableModules.join(',');
+  if (prevAvailableModulesKey !== currentAvailableModulesKey) {
+    setPrevAvailableModulesKey(currentAvailableModulesKey);
     setSelectedModules(new Set(availableModules));
-  }, [availableModules]);
+  }
 
   // Filter graph data based on selected modules
   const filteredGraphData = useMemo(() => {
