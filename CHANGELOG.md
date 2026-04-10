@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/kaiehrhardt/terradot/compare/1.2.0...1.2.1) (2026-04-10)
+
+
+### Bug Fixes
+
+* **lint:** resolve CI lint errors in App.tsx and eslint config ([91f8988](https://github.com/kaiehrhardt/terradot/commit/91f898898736b4f96bddb336a61041bc874636c6))
+
 # [1.2.0](https://github.com/kaiehrhardt/terradot/compare/1.1.1...1.2.0) (2026-02-28)
 
 
