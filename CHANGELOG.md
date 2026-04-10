@@ -1,3 +1,11 @@
+## [1.2.4](https://github.com/kaiehrhardt/terradot/compare/1.2.3...1.2.4) (2026-04-10)
+
+
+### Bug Fixes
+
+* switch back to node runtime ([f745a89](https://github.com/kaiehrhardt/terradot/commit/f745a89b664e6bc2de64fb8e179e9717faf3569e))
+* use bun runtime for sematic release ([f514766](https://github.com/kaiehrhardt/terradot/commit/f514766912420de072a9254d5dc1d55583335691))
+
 ## [1.2.3](https://github.com/kaiehrhardt/terradot/compare/1.2.2...1.2.3) (2026-04-10)
 
 
