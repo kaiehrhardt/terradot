@@ -23,6 +23,15 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
 
+      # semantic-release requires Node.js ^22.14.0 || >= 24.10.0 (see package.json).
+      # Bun's built-in Node.js compat version (v24.3.0) falls outside that range,
+      # so we explicitly set up Node 22 here — Bun still handles installs and
+      # script dispatch, but the semantic-release binary picks up Node from PATH.
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
       - name: Setup Bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
         with:
@@ -35,4 +44,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
           GH_TOKEN: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
-        run: bun --bun run release
+        run: bun run release
