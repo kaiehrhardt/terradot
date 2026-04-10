@@ -35,4 +35,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
           GH_TOKEN: ${{ secrets.SEMANTIC_RELEASE_TOKEN }}
-        run: bun run release
+        run: bun --bun run release
