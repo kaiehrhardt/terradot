@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/kaiehrhardt/terradot/compare/1.3.0...1.3.1) (2026-04-13)
+
+
+### Bug Fixes
+
+* prevent stuck loading spinner and incomplete reset in handleLoadExample ([a465c66](https://github.com/kaiehrhardt/terradot/commit/a465c66ff916337eae9cb42fbea6eba1879539c5))
+
 # [1.3.0](https://github.com/kaiehrhardt/terradot/compare/1.2.5...1.3.0) (2026-04-13)
 
 
