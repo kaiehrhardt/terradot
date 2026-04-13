@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/kaiehrhardt/terradot/compare/1.2.5...1.3.0) (2026-04-13)
+
+
+### Features
+
+* add direct-only neighbor toggle for node selection ([ab79ebd](https://github.com/kaiehrhardt/terradot/commit/ab79ebdb3caea169cda496684c5a8b29202b2f98)), closes [#26](https://github.com/kaiehrhardt/terradot/issues/26)
+
 ## [1.2.5](https://github.com/kaiehrhardt/terradot/compare/1.2.4...1.2.5) (2026-04-10)
 
 
