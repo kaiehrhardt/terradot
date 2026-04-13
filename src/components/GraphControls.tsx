@@ -12,6 +12,8 @@ interface GraphControlsProps {
   onLayoutChange: (layoutEngine: LayoutEngine) => void;
   showSuccessors: boolean;
   onToggleSuccessors: () => void;
+  directOnly: boolean;
+  onToggleDirectOnly: () => void;
   ignoreDataNodes: boolean;
   onToggleIgnoreDataNodes: () => void;
   availableModules: string[];
@@ -32,6 +34,8 @@ export default function GraphControls({
   onLayoutChange,
   showSuccessors,
   onToggleSuccessors,
+  directOnly,
+  onToggleDirectOnly,
   ignoreDataNodes,
   onToggleIgnoreDataNodes,
   availableModules,
@@ -142,6 +146,35 @@ export default function GraphControls({
             <span>Predecessors</span>
           </>
         )}
+      </button>
+
+      {/* Direct-only Toggle */}
+      <button
+        onClick={onToggleDirectOnly}
+        className={`${buttonGhost} min-w-[116px]`}
+        aria-label="Toggle between all and direct neighbors only"
+        title={
+          directOnly ? 'Showing only direct neighbors (1 hop)' : 'Showing all transitive neighbors'
+        }
+      >
+        <svg className="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {directOnly ? (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          ) : (
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 10h16M4 14h16M4 18h16"
+            />
+          )}
+        </svg>
+        <span>{directOnly ? 'Direct' : 'All'}</span>
       </button>
 
       {/* Ignore data nodes */}

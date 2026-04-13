@@ -509,6 +509,43 @@ export function findAllSuccessors(
 }
 
 /**
+ * Find only the direct (1-hop) ancestors of a node (immediate parents)
+ */
+export function findDirectAncestors(
+  nodeId: string,
+  graphData: GraphData
+): { nodes: Set<string>; edges: Set<string> } {
+  const nodes = new Set<string>([nodeId]);
+  const edges = new Set<string>();
+  const parents = graphData.adjacencyList.get(nodeId) || [];
+  for (const parent of parents) {
+    nodes.add(parent);
+    edges.add(`${parent}->${nodeId}`);
+    edges.add(`${nodeId}<-${parent}`);
+  }
+  return { nodes, edges };
+}
+
+/**
+ * Find only the direct (1-hop) successors of a node (immediate children)
+ */
+export function findDirectSuccessors(
+  nodeId: string,
+  graphData: GraphData
+): { nodes: Set<string>; edges: Set<string> } {
+  const nodes = new Set<string>([nodeId]);
+  const edges = new Set<string>();
+  for (const edge of graphData.edges) {
+    if (edge.from === nodeId) {
+      nodes.add(edge.to);
+      edges.add(`${nodeId}->${edge.to}`);
+      edges.add(`${edge.to}<-${nodeId}`);
+    }
+  }
+  return { nodes, edges };
+}
+
+/**
  * Get edges that form a path
  */
 export function getPathEdges(path: string[]): Set<string> {

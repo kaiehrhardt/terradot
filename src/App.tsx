@@ -9,6 +9,8 @@ import {
   filterGraphByModules,
   findAllAncestors,
   findAllSuccessors,
+  findDirectAncestors,
+  findDirectSuccessors,
   findRootNodes,
   graphDataToDotString,
   parseDotString,
@@ -22,6 +24,7 @@ function App() {
   const [layoutEngine, setLayoutEngine] = useState<LayoutEngine>('dot-lr');
   const [searchQuery, setSearchQuery] = useState('');
   const [showSuccessors, setShowSuccessors] = useState(false);
+  const [directOnly, setDirectOnly] = useState(false);
   const [selectedModules, setSelectedModules] = useState<Set<string>>(new Set());
   const [ignoreDataNodes, setIgnoreDataNodes] = useState(false);
   const graphRenderStartRef = useRef<(() => void) | null>(null);
@@ -52,6 +55,11 @@ function App() {
   // Toggle between ancestors and successors
   const handleToggleSuccessors = useCallback(() => {
     setShowSuccessors((prev: boolean) => !prev);
+  }, []);
+
+  // Toggle between all and direct-only highlighting
+  const handleToggleDirectOnly = useCallback(() => {
+    setDirectOnly((prev: boolean) => !prev);
   }, []);
 
   // Debounce DOT string parsing
@@ -102,15 +110,20 @@ function App() {
     ignoreDataNodes,
   ]);
 
-  // Calculate all ancestors or successors when a node is selected
+  // Calculate ancestors or successors (all or direct-only) when a node is selected
   const highlightData = useMemo(() => {
     if (!selectedNode || filteredGraphData.nodes.size === 0) {
       return { nodes: new Set<string>(), edges: new Set<string>() };
     }
+    if (directOnly) {
+      return showSuccessors
+        ? findDirectSuccessors(selectedNode, filteredGraphData)
+        : findDirectAncestors(selectedNode, filteredGraphData);
+    }
     return showSuccessors
       ? findAllSuccessors(selectedNode, filteredGraphData)
       : findAllAncestors(selectedNode, filteredGraphData);
-  }, [selectedNode, filteredGraphData, showSuccessors]);
+  }, [selectedNode, filteredGraphData, showSuccessors, directOnly]);
 
   // Handle node click
   const handleNodeClick = useCallback((nodeId: string) => {
@@ -168,7 +181,8 @@ function App() {
     if (highlightCount > 1) {
       const edgeCount = highlightData.edges.size / 2;
       const type = showSuccessors ? 'successor' : 'ancestor';
-      return `"${selectedNode}" has ${highlightCount - 1} ${type}${highlightCount - 1 !== 1 ? 's' : ''} (${edgeCount} edge${edgeCount !== 1 ? 's' : ''})`;
+      const scope = directOnly ? 'direct ' : '';
+      return `"${selectedNode}" has ${highlightCount - 1} ${scope}${type}${highlightCount - 1 !== 1 ? 's' : ''} (${edgeCount} edge${edgeCount !== 1 ? 's' : ''})`;
     }
 
     return `"${selectedNode}" (isolated node)`;
@@ -264,6 +278,8 @@ function App() {
                     onLayoutChange={handleLayoutChange}
                     showSuccessors={showSuccessors}
                     onToggleSuccessors={handleToggleSuccessors}
+                    directOnly={directOnly}
+                    onToggleDirectOnly={handleToggleDirectOnly}
                     ignoreDataNodes={ignoreDataNodes}
                     onToggleIgnoreDataNodes={handleToggleIgnoreDataNodes}
                     availableModules={availableModules}
