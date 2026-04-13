@@ -144,11 +144,15 @@ function App() {
 
   // Load example graph
   const handleLoadExample = useCallback(() => {
-    graphRenderStartRef.current?.();
+    if (dotString !== EXAMPLE_GRAPH) {
+      graphRenderStartRef.current?.();
+    }
     setDotString(EXAMPLE_GRAPH);
     setSelectedNode(null);
     setSearchQuery('');
-  }, []);
+    setIgnoreDataNodes(false);
+    setSelectedModules(new Set(availableModules));
+  }, [dotString, availableModules]);
 
   // Handle module selection change
   const handleModuleSelectionChange = useCallback((modules: Set<string>) => {
