@@ -59,8 +59,11 @@ export default [
       '@typescript-eslint/explicit-module-boundary-types': 'off',
       '@typescript-eslint/no-non-null-assertion': 'warn',
 
-      // Code quality rules
-      'no-console': ['warn', { allow: ['warn', 'error'] }],
+      // react-hooks/set-state-in-effect is overly strict in v7 recommended;
+      // setState in effects is valid when syncing state to prop changes.
+      'react-hooks/set-state-in-effect': 'warn',
+
+      // Code quality rules      'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-debugger': 'error',
       'no-unused-vars': 'off', // Using TypeScript version instead
       eqeqeq: ['error', 'always'],

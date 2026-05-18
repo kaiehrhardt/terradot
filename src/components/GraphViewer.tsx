@@ -232,6 +232,13 @@ export default function GraphViewer({
     [getRenderedSvg]
   );
 
+  const clearRenderTimeout = useCallback(() => {
+    if (renderTimeoutRef.current !== null) {
+      window.clearTimeout(renderTimeoutRef.current);
+      renderTimeoutRef.current = null;
+    }
+  }, []);
+
   const notifyRenderStart = useCallback(() => {
     setError(null);
     setGraphRendered(false);
@@ -239,7 +246,7 @@ export default function GraphViewer({
     renderStartRef.current = window.performance.now();
     clearRenderTimeout();
     notifyRenderStatus(false);
-  }, [notifyRenderStatus]);
+  }, [clearRenderTimeout, notifyRenderStatus]);
 
   useEffect(() => {
     onRenderStartReady?.(notifyRenderStart);
@@ -248,13 +255,6 @@ export default function GraphViewer({
   useEffect(() => {
     onExportReady?.(exportGraph);
   }, [exportGraph, onExportReady]);
-
-  const clearRenderTimeout = () => {
-    if (renderTimeoutRef.current !== null) {
-      window.clearTimeout(renderTimeoutRef.current);
-      renderTimeoutRef.current = null;
-    }
-  };
 
   const setupInteractivity = useCallback(() => {
     if (!containerRef.current) return;
@@ -345,12 +345,17 @@ export default function GraphViewer({
     svg.select('g > rect').attr('fill', isDark ? '#111827' : 'white');
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!dotString.trim()) {
       setGraphRendered(false);
       setIsRendering(false);
       clearRenderTimeout();
       notifyRenderStatus(false);
+    }
+  }, [dotString, clearRenderTimeout, notifyRenderStatus]);
+
+  useLayoutEffect(() => {
+    if (!dotString.trim()) {
       return;
     }
 
