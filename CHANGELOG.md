@@ -1,3 +1,11 @@
+## [1.3.2](https://github.com/kaiehrhardt/terradot/compare/1.3.1...1.3.2) (2026-05-18)
+
+
+### Bug Fixes
+
+* **deps:** update all dependencies ([19129ae](https://github.com/kaiehrhardt/terradot/commit/19129ae994447c6f12a317cdc080e5ef3f0f7806))
+* linter issues ([dd83d95](https://github.com/kaiehrhardt/terradot/commit/dd83d95fce74b02ee0efa57a1ec1ba5a9758b9be))
+
 ## [1.3.1](https://github.com/kaiehrhardt/terradot/compare/1.3.0...1.3.1) (2026-04-13)
 
 
