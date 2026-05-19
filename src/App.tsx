@@ -101,8 +101,8 @@ function App() {
       );
       setSelectedModules(validUrlModules.size > 0 ? validUrlModules : new Set(availableModules));
       setUrlModulesApplied(true);
-    } else if (urlModulesApplied) {
-      // DOT input changed after initial load — reset to all modules
+    } else {
+      // Default: select all modules (also resets when DOT input changes)
       setSelectedModules(new Set(availableModules));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
