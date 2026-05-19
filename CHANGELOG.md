@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/kaiehrhardt/terradot/compare/1.3.2...1.4.0) (2026-05-19)
+
+
+### Features
+
+* add URL-based state sharing ([c80be97](https://github.com/kaiehrhardt/terradot/commit/c80be975d91c35c747e93c7834dc78061c078a1e))
+
 ## [1.3.2](https://github.com/kaiehrhardt/terradot/compare/1.3.1...1.3.2) (2026-05-18)
 
 
