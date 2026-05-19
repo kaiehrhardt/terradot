@@ -435,7 +435,7 @@ export default function GraphViewer({
     renderFrameRef.current = window.requestAnimationFrame(() => {
       renderDelayRef.current = window.setTimeout(startRender, 0);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     return () => {
       if (renderFrameRef.current !== null) {
         window.cancelAnimationFrame(renderFrameRef.current);

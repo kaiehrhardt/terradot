@@ -35,11 +35,11 @@ function App() {
   const [showSuccessors, setShowSuccessors] = useState(urlState.showSuccessors ?? false);
   const [directOnly, setDirectOnly] = useState(urlState.directOnly ?? false);
   const [selectedModules, setSelectedModules] = useState<Set<string>>(
-    urlState.selectedModules ?? new Set(),
+    urlState.selectedModules ?? new Set()
   );
   const [ignoreDataNodes, setIgnoreDataNodes] = useState(urlState.ignoreDataNodes ?? false);
-  // Track whether the initial module selection came from the URL (needs deferred apply)
-  const urlModulesRef = useRef<Set<string> | null>(urlState.selectedModules ?? null);
+  // Preserve URL-provided module selection for deferred application after modules are extracted
+  const [pendingUrlModules] = useState<Set<string> | null>(urlState.selectedModules ?? null);
   const graphRenderStartRef = useRef<(() => void) | null>(null);
   const graphExportRef = useRef<((options: GraphExportOptions) => void) | null>(null);
   const [graphReady, setGraphReady] = useState(false);
@@ -90,22 +90,23 @@ function App() {
     return extractModules(graphData);
   }, [graphData]);
 
-  // Reset selected modules when availableModules changes (update during render - React recommended pattern)
-  const [prevAvailableModulesKey, setPrevAvailableModulesKey] = useState('');
-  const currentAvailableModulesKey = availableModules.join(',');
-  if (prevAvailableModulesKey !== currentAvailableModulesKey) {
-    setPrevAvailableModulesKey(currentAvailableModulesKey);
-    if (urlModulesRef.current !== null) {
-      // Apply URL-provided module selection, filtered to only valid modules
+  // Reset selected modules when availableModules changes
+  // On first load with URL params, apply the URL module selection; afterwards reset to all modules
+  const [urlModulesApplied, setUrlModulesApplied] = useState(false);
+  useEffect(() => {
+    if (availableModules.length === 0) return;
+    if (pendingUrlModules !== null && !urlModulesApplied) {
       const validUrlModules = new Set(
-        Array.from(urlModulesRef.current).filter(m => availableModules.includes(m)),
+        Array.from(pendingUrlModules).filter(m => availableModules.includes(m))
       );
       setSelectedModules(validUrlModules.size > 0 ? validUrlModules : new Set(availableModules));
-      urlModulesRef.current = null;
-    } else {
+      setUrlModulesApplied(true);
+    } else if (urlModulesApplied) {
+      // DOT input changed after initial load — reset to all modules
       setSelectedModules(new Set(availableModules));
     }
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [availableModules]);
 
   // Filter graph data based on selected modules
   const filteredGraphData = useMemo(() => {
@@ -196,11 +197,28 @@ function App() {
   // Sync shareable state to URL (replaceState - no new history entry)
   useEffect(() => {
     const url = encodeState(
-      { dotString, layoutEngine, showSuccessors, directOnly, ignoreDataNodes, selectedModules, selectedNode },
-      new Set(availableModules),
+      {
+        dotString,
+        layoutEngine,
+        showSuccessors,
+        directOnly,
+        ignoreDataNodes,
+        selectedModules,
+        selectedNode,
+      },
+      new Set(availableModules)
     );
     window.history.replaceState(null, '', url);
-  }, [dotString, layoutEngine, showSuccessors, directOnly, ignoreDataNodes, selectedModules, selectedNode, availableModules]);
+  }, [
+    dotString,
+    layoutEngine,
+    showSuccessors,
+    directOnly,
+    ignoreDataNodes,
+    selectedModules,
+    selectedNode,
+    availableModules,
+  ]);
 
   // Generate info message
   const highlightedNodeInfo = useMemo(() => {
