@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/kaiehrhardt/terradot/compare/1.4.1...1.4.2) (2026-05-19)
+
+
+### Bug Fixes
+
+* **deps:** pin dependencies ([d934bd6](https://github.com/kaiehrhardt/terradot/commit/d934bd6f71b0f84c09378efbd7370594c1678535))
+
 ## [1.4.1](https://github.com/kaiehrhardt/terradot/compare/1.4.0...1.4.1) (2026-05-19)
 
 
