@@ -24,6 +24,16 @@ export interface GraphExportOptions {
   source: GraphExportSource;
 }
 
+export interface ShareableState {
+  dotString: string;
+  layoutEngine: LayoutEngine;
+  showSuccessors: boolean;
+  directOnly: boolean;
+  ignoreDataNodes: boolean;
+  selectedModules: Set<string>;
+  selectedNode: string | null;
+}
+
 export interface GraphViewerProps {
   dotString: string;
   onRenderStartReady?: (start: () => void) => void;

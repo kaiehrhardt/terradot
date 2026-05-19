@@ -16,17 +16,30 @@ import {
   parseDotString,
 } from './utils/graphParser';
 import { EXAMPLE_GRAPH } from './utils/examples';
+import { decodeState, encodeState, hasShareParams } from './utils/shareUrl';
 import type { GraphExportOptions, LayoutEngine } from './types/graph.types';
 
 function App() {
-  const [dotString, setDotString] = useState(EXAMPLE_GRAPH);
-  const [selectedNode, setSelectedNode] = useState<string | null>(null);
-  const [layoutEngine, setLayoutEngine] = useState<LayoutEngine>('dot-lr');
+  // Parse URL params once on mount for initial state
+  const urlState = useMemo(() => {
+    if (hasShareParams(window.location.search)) {
+      return decodeState(window.location.search);
+    }
+    return {};
+  }, []);
+
+  const [dotString, setDotString] = useState(urlState.dotString ?? EXAMPLE_GRAPH);
+  const [selectedNode, setSelectedNode] = useState<string | null>(urlState.selectedNode ?? null);
+  const [layoutEngine, setLayoutEngine] = useState<LayoutEngine>(urlState.layoutEngine ?? 'dot-lr');
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSuccessors, setShowSuccessors] = useState(false);
-  const [directOnly, setDirectOnly] = useState(false);
-  const [selectedModules, setSelectedModules] = useState<Set<string>>(new Set());
-  const [ignoreDataNodes, setIgnoreDataNodes] = useState(false);
+  const [showSuccessors, setShowSuccessors] = useState(urlState.showSuccessors ?? false);
+  const [directOnly, setDirectOnly] = useState(urlState.directOnly ?? false);
+  const [selectedModules, setSelectedModules] = useState<Set<string>>(
+    urlState.selectedModules ?? new Set(),
+  );
+  const [ignoreDataNodes, setIgnoreDataNodes] = useState(urlState.ignoreDataNodes ?? false);
+  // Track whether the initial module selection came from the URL (needs deferred apply)
+  const urlModulesRef = useRef<Set<string> | null>(urlState.selectedModules ?? null);
   const graphRenderStartRef = useRef<(() => void) | null>(null);
   const graphExportRef = useRef<((options: GraphExportOptions) => void) | null>(null);
   const [graphReady, setGraphReady] = useState(false);
@@ -82,7 +95,16 @@ function App() {
   const currentAvailableModulesKey = availableModules.join(',');
   if (prevAvailableModulesKey !== currentAvailableModulesKey) {
     setPrevAvailableModulesKey(currentAvailableModulesKey);
-    setSelectedModules(new Set(availableModules));
+    if (urlModulesRef.current !== null) {
+      // Apply URL-provided module selection, filtered to only valid modules
+      const validUrlModules = new Set(
+        Array.from(urlModulesRef.current).filter(m => availableModules.includes(m)),
+      );
+      setSelectedModules(validUrlModules.size > 0 ? validUrlModules : new Set(availableModules));
+      urlModulesRef.current = null;
+    } else {
+      setSelectedModules(new Set(availableModules));
+    }
   }
 
   // Filter graph data based on selected modules
@@ -170,6 +192,15 @@ function App() {
   const handleExport = useCallback((options: GraphExportOptions) => {
     graphExportRef.current?.(options);
   }, []);
+
+  // Sync shareable state to URL (replaceState - no new history entry)
+  useEffect(() => {
+    const url = encodeState(
+      { dotString, layoutEngine, showSuccessors, directOnly, ignoreDataNodes, selectedModules, selectedNode },
+      new Set(availableModules),
+    );
+    window.history.replaceState(null, '', url);
+  }, [dotString, layoutEngine, showSuccessors, directOnly, ignoreDataNodes, selectedModules, selectedNode, availableModules]);
 
   // Generate info message
   const highlightedNodeInfo = useMemo(() => {
