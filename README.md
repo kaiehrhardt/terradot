@@ -18,6 +18,7 @@ An interactive web service for visualizing and exploring Graphviz DOT graphs.
 ## ✨ Features
 
 - **Interactive Graph Visualization**: Render DOT graphs with real Graphviz engine (WebAssembly)
+- **Shareable Links**: Share your current graph view via URL — all state is encoded directly in the link (DOT code, layout, filters, selected node, active modules)
 - **Bidirectional Path Highlighting**: Click on a node to highlight paths
   - **Predecessors Mode**: Shows all ancestor paths leading TO the clicked node
   - **Successors Mode**: Shows all descendant paths leading FROM the clicked node
@@ -72,8 +73,9 @@ The dev server runs at `http://localhost:5173/`
    - Use the toggle to switch between Predecessors (ancestors) and Successors (descendants)
    - View detailed path statistics in the info panel
 5. **Search**: Use the search bar to find and highlight specific nodes
-6. **Resize panels**: Drag the divider between editor and viewer to adjust sizes
-7. **Toggle dark mode**: Click the theme toggle for comfortable viewing in any lighting
+6. **Share**: Click the **Share** button to copy a shareable URL to your clipboard — the link encodes the full graph state including DOT code, layout direction, active modules, data node visibility, traversal mode, and selected node
+7. **Resize panels**: Drag the divider between editor and viewer to adjust sizes
+8. **Toggle dark mode**: Click the theme toggle for comfortable viewing in any lighting
 
 ### Example DOT Syntax
 
@@ -99,11 +101,12 @@ terradot/
 ├── src/
 │   ├── components/
 │   │   ├── GraphViewer.tsx        # Main graph rendering component (d3-graphviz)
-│   │   ├── GraphControls.tsx      # Controls (search, layout, dark mode, toggle)
+│   │   ├── GraphControls.tsx      # Controls (layout, export, share, toggles)
 │   │   ├── DotInputEditor.tsx     # DOT syntax editor
 │   │   └── ResizablePanels.tsx    # Resizable split-panel layout
 │   ├── utils/
 │   │   ├── graphParser.ts         # DOT parsing & path algorithms (BFS, ancestors, successors)
+│   │   ├── shareUrl.ts            # URL state encoding/decoding (pako + base64url)
 │   │   └── examples.ts            # Example graphs
 │   ├── types/
 │   │   └── graph.types.ts         # TypeScript types
@@ -122,6 +125,7 @@ terradot/
 - **Graph Rendering**: [d3-graphviz](https://github.com/magjac/d3-graphviz) (Graphviz via WebAssembly)
 - **Styling**: [Tailwind CSS](https://tailwindcss.com/) 3
 - **Graphviz Engine**: [@hpcc-js/wasm](https://github.com/hpcc-systems/hpcc-js-wasm)
+- **URL Compression**: [pako](https://github.com/nodeca/pako) (deflate/inflate for shareable links)
 
 ## 📝 License
 
