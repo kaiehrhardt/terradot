@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/kaiehrhardt/terradot/compare/1.4.0...1.4.1) (2026-05-19)
+
+
+### Bug Fixes
+
+* **lint:** resolve ref-during-render and prettier errors in App.tsx ([deec0e8](https://github.com/kaiehrhardt/terradot/commit/deec0e8de391524b3fd891e4a4fa2211b656877f))
+
 # [1.4.0](https://github.com/kaiehrhardt/terradot/compare/1.3.2...1.4.0) (2026-05-19)
 
 
