@@ -1,3 +1,10 @@
+## [1.4.3](https://github.com/kaiehrhardt/terradot/compare/1.4.2...1.4.3) (2026-05-19)
+
+
+### Bug Fixes
+
+* always select all modules by default when no URL state present ([2ffca6e](https://github.com/kaiehrhardt/terradot/commit/2ffca6ec24e12a5058c6a7a1d22bde79f7c5c7b6))
+
 ## [1.4.2](https://github.com/kaiehrhardt/terradot/compare/1.4.1...1.4.2) (2026-05-19)
 
 
