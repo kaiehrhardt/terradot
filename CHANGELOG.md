@@ -1,3 +1,10 @@
+## [1.4.4](https://github.com/kaiehrhardt/terradot/compare/1.4.3...1.4.4) (2026-05-25)
+
+
+### Bug Fixes
+
+* **deps:** update all dependencies ([#31](https://github.com/kaiehrhardt/terradot/issues/31)) ([98b97e3](https://github.com/kaiehrhardt/terradot/commit/98b97e31853fe697afe7df205a50f359682865cc))
+
 ## [1.4.3](https://github.com/kaiehrhardt/terradot/compare/1.4.2...1.4.3) (2026-05-19)
 
 
