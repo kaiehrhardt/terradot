@@ -1,3 +1,10 @@
+## [1.4.5](https://github.com/kaiehrhardt/terradot/compare/1.4.4...1.4.5) (2026-05-28)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @hpcc-js/wasm to v2.33.8 ([#33](https://github.com/kaiehrhardt/terradot/issues/33)) ([e654822](https://github.com/kaiehrhardt/terradot/commit/e654822ae3839cfcc5a305e19f5d5e2157e7df8c))
+
 ## [1.4.4](https://github.com/kaiehrhardt/terradot/compare/1.4.3...1.4.4) (2026-05-25)
 
 
