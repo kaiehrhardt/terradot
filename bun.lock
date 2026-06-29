@@ -9,7 +9,7 @@
         "d3-graphviz": "5.6.0",
         "d3-selection": "3.0.0",
         "d3-zoom": "3.0.0",
-        "pako": "2.1.0",
+        "pako": "3.0.0",
         "react": "19.2.7",
         "react-dom": "19.2.7",
       },
@@ -735,7 +735,7 @@
 
     "p-try": ["p-try@1.0.0", "", {}, "sha512-U1etNYuMJoIz3ZXSrrySFjsXQTWOx2/jdi86L+2pRvph/qMKL6sbcCYdH23fqsbm8TH2Gn0OybpT4eSFlCVHww=="],
 
-    "pako": ["pako@2.1.0", "", {}, "sha512-w+eufiZ1WuJYgPXbV/PO3NCMEc3xqylkKHzp8bxp1uW4qaSNQUkwmLLEc3kKsfz8lpV1F8Ht3U1Cm+9Srog2ug=="],
+    "pako": ["pako@3.0.0", "", {}, "sha512-TGPtlCI1pSUSbkOIxOUUHNrBa0muz4mAp32cYUF3RoSa5c73jiQTKOKo22gaa4DxLggQrda/DAdax5QkcHPvYA=="],
 
     "parent-module": ["parent-module@1.0.1", "", { "dependencies": { "callsites": "^3.0.0" } }, "sha512-GQ2EWRpQV8/o+Aw8YqtfZZPfNRWZYkbidE9k5rpl/hC3vtHHBfGm2Ifi6qWV+coDGkrUKZAxE3Lot5kcsRlh+g=="],
 
