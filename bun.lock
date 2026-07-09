@@ -5,7 +5,7 @@
     "": {
       "name": "terradot",
       "dependencies": {
-        "@hpcc-js/wasm": "2.34.4",
+        "@hpcc-js/wasm": "2.34.5",
         "d3-graphviz": "5.6.0",
         "d3-selection": "3.0.0",
         "d3-zoom": "3.0.0",
@@ -113,7 +113,7 @@
 
     "@eslint/plugin-kit": ["@eslint/plugin-kit@0.7.2", "", { "dependencies": { "@eslint/core": "^1.2.1", "levn": "^0.4.1" } }, "sha512-+CNAzxglkrpNf/kKywqQfk74QjtceuOE7Qm+AF8miRvPF/wmmK5+OJOgVh3AVTT3RP2mH3+FOaxlE5v72owk0A=="],
 
-    "@hpcc-js/wasm": ["@hpcc-js/wasm@2.34.4", "", { "dependencies": { "yargs": "18.0.0" }, "bin": { "dot-wasm": "deprecated/dot-wasm.js" } }, "sha512-e9Dhx05ma4gWkX+tp2xH/ZD1LPLnHF4DKsHyaQfbz+MbmVuLrcejR87vrDHyVc/a/pjUHL5HvP04wKk7oioAfQ=="],
+    "@hpcc-js/wasm": ["@hpcc-js/wasm@2.34.5", "", { "dependencies": { "yargs": "18.0.0" }, "bin": { "dot-wasm": "deprecated/dot-wasm.js" } }, "sha512-GK/uv5Wg723QsrqeXbexrFtLd1q4IDSyPUOo4EA+nNMdhA4c7yDeBoBttYRRozPj9semwm4XEbQisGkuJLKCgQ=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.2", "", { "dependencies": { "@humanfs/types": "^0.15.0" } }, "sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA=="],
 
