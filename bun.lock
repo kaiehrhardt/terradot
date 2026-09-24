@@ -22,7 +22,7 @@
         "@semantic-release/npm": "13.1.5",
         "@semantic-release/release-notes-generator": "14.1.1",
         "@tailwindcss/postcss": "4.3.2",
-        "@types/d3-graphviz": "2.6.10",
+        "@types/d3-graphviz": "3.1.0",
         "@types/d3-selection": "3.0.11",
         "@types/d3-zoom": "3.0.8",
         "@types/node": "26.6.1",
@@ -257,7 +257,7 @@
 
     "@types/d3-color": ["@types/d3-color@3.1.3", "", {}, "sha512-iO90scth9WAbmgv7ogoq57O9YpKmFBbmoEoCHDB2xMBY0+/KVrqAaCDyCE16dUspeOvIxFFRI+0sEtqDqy2b4A=="],
 
-    "@types/d3-graphviz": ["@types/d3-graphviz@2.6.10", "", { "dependencies": { "@types/d3-selection": "^1", "@types/d3-transition": "^1", "@types/d3-zoom": "^1" } }, "sha512-YsCRqNqS8QLlsKtF0FGIz42Z47B0sBIxMMn7L4ZdqZcrdk4foJOEPwwMH50Qe2PuZmSSZcWbdgUnj5W68xK0Qw=="],
+    "@types/d3-graphviz": ["@types/d3-graphviz@3.1.0", "", { "dependencies": { "@types/d3-selection": "^1", "@types/d3-transition": "^1", "@types/d3-zoom": "^1" } }, "sha512-LUu4guz1M5j15I7g24676TOwlB/+Lp5zstnZ+R2/+ON0TOMnYKArD3qDLws0a4iETre+uvS8cYaOMUT63BEUkw=="],
 
     "@types/d3-interpolate": ["@types/d3-interpolate@3.0.4", "", { "dependencies": { "@types/d3-color": "*" } }, "sha512-mgLPETlrpVV1YRJIglr4Ez47g7Yxjl1lj7YKsiMCb27VJH9W8NVM6Bb9d8kkpG/uAQS5AmbA48q2IAolKKo1MA=="],
 
