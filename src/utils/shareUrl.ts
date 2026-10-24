@@ -73,7 +73,7 @@ export function decodeState(search: string): Partial<ShareableState> {
   if (d) {
     try {
       const bytes = fromBase64Url(d);
-      const decompressed = inflateRaw(bytes, { to: 'string' });
+      const decompressed = inflateRaw(bytes, { toText: true });
       result.dotString = decompressed;
     } catch {
       // ignore malformed d param
